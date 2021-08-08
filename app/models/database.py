@@ -4,10 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import Config
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{Config.DATABASE_USER}:\
-                                        {Config.DATABASE_PASSWORD}@\
-                                        {Config.DATABASE_URL}/\
-                                        {Config.DATABASE_NAME}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
