@@ -1,17 +1,17 @@
 from typing import List
 
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.schemas import user
-from app.models import database
 from app.crud.user import (
+    crud_create_user,
     crud_get_user,
     crud_get_user_by_email,
     crud_get_users,
-    crud_create_user,
 )
+from app.models import database
 from app.models.database import SessionLocal, engine
+from app.schemas import user
 
 database.Base.metadata.create_all(bind=engine)
 
