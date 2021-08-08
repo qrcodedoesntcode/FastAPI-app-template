@@ -1,6 +1,6 @@
 # FastAPI app template [WIP]
 
-## Install dependencies :
+## Install dependencies :
 
 First you need to have at least **Python 3.6**.
 
