@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -9,22 +10,10 @@ from app.crud.user import (
     crud_get_user_by_email,
     crud_get_users,
 )
-from app.models import database
-from app.models.database import SessionLocal, engine
+from app.models.database import get_db
 from app.schemas import user
 
-database.Base.metadata.create_all(bind=engine)
-
 router = APIRouter(prefix="/users", tags=["Users"])
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=user.User)
