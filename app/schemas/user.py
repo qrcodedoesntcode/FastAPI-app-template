@@ -1,11 +1,11 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     is_active: Optional[bool] = None
 
     class Config:
@@ -14,4 +14,4 @@ class User(BaseModel):
 
 class UserCreate(User):
     password: str
-    email: str
+    email: EmailStr
