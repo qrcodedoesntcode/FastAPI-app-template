@@ -16,9 +16,10 @@ from app.models.database import get_db
 from app.schemas.user import User, UserCreate
 
 router = APIRouter(prefix="/user")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{Config.API_V1_STR}/login")
 
 
+@router.get("/current", response_model=User)
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
