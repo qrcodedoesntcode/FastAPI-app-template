@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.core.security import get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate
 
@@ -17,9 +18,25 @@ def crud_get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def crud_create_user(db: Session, user: UserCreate):
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = User(email=user.email, hashed_password=fake_hashed_password)
+    db_user = User(
+        username=user.username,
+        hashed_password=get_password_hash(user.password),
+        email=user.email,
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_user(db, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = get_user(db, username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user

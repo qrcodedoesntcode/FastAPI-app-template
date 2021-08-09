@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from .api import user
+from .api import token, user
 from .core.config import Config
 
 app = FastAPI(title=Config.PROJECT_NAME, openapi_url="/api/v1/openapi.json")
@@ -26,3 +26,4 @@ if Config.BACKEND_CORS_ORIGINS:
     ),
 
 app.include_router(user.router, prefix=Config.API_V1_STR)
+app.include_router(token.router)
