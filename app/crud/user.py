@@ -5,19 +5,19 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 
-def crud_get_user(db: Session, user_id: int):
+def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
 
-def crud_get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 
-def crud_get_users(db: Session, skip: int = 0, limit: int = 100):
+def get_all_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
 
 
-def crud_create_user(db: Session, user: UserCreate):
+def create_new_user(db: Session, user: UserCreate):
     db_user = User(
         username=user.username,
         hashed_password=get_password_hash(user.password),
@@ -29,12 +29,12 @@ def crud_create_user(db: Session, user: UserCreate):
     return db_user
 
 
-def get_user(db, username: str):
+def get_user_by_username(db, username: str):
     return db.query(User).filter(User.username == username).first()
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
+    user = get_user_by_username(db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
