@@ -3,13 +3,9 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class UserBase(BaseModel):
-    email: str
-
-
 class User(BaseModel):
     username: str
-    email: Optional[str] = None
+    email: str
     is_active: Optional[bool] = None
 
     class Config:
