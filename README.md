@@ -15,7 +15,8 @@ pip3 install -r requirements/dev.txt
 Run a postgresql database in docker :
 
 ```docker
-docker run -d --name postgres-app -e POSTGRES_USER=app -e POSTGRES_DB=app -e POSTGRES_PASSWORD=password -e PGDATA=/var/lib/postgresql/data/pgdata -v pgdata:/var/lib/postgresql/data -p 5432:5432 postgres
+docker network create fast-api
+docker run -d --network fast-api --name postgres-app -e POSTGRES_USER=app -e POSTGRES_DB=app -e POSTGRES_PASSWORD=password -e PGDATA=/var/lib/postgresql/data/pgdata -v pgdata:/var/lib/postgresql/data -p 5432:5432 postgres
 ```
 
 ## Alembic migration :
@@ -38,10 +39,17 @@ DELETE FROM alembic_version;
 
 ## Start and dev :
 
-Start the server :
+Start the server without docker :
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+Docker version :
+
+```
+docker build . -f docker/dockerfile.dev -t app-fast-api:dev
+docker run --rm --name fastapi --network fast-api --env-file app/config/.env -it -v $PWD:/app/fast-api/ -p 8000:8000 app-fast-api:dev
 ```
 
 Dev :)
