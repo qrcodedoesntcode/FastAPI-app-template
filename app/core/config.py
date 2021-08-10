@@ -1,18 +1,24 @@
 import os
 from typing import Optional
 
+from dotenv import load_dotenv
+
 
 class Config(object):
     """Base configuration."""
+
+    APP_DIR = os.path.dirname(__file__)
+    ROOT_DIR = os.path.abspath(os.path.join(APP_DIR, os.pardir))
+    CONFIG_PATH = os.path.join(ROOT_DIR, "config/.env")
+
+    load_dotenv(CONFIG_PATH)
 
     def _get(key: str, default: Optional[str] = ""):
         return os.getenv(key, default)
 
     API_V1_STR = "/api/v1"
 
-    SECRET_KEY = _get("SECRET_KEY")
-    if not SECRET_KEY:
-        SECRET_KEY = os.urandom(32)
+    SECRET_KEY = _get("SECRET_KEY", os.urandom(32))
 
     ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 days
 
@@ -27,8 +33,5 @@ class Config(object):
     DATABASE_PASSWORD = _get("DATABASE_PASSWORD", "password")
     DATABASE_URL = _get("DATABASE_URL", "127.0.0.1")
     DATABASE_NAME = _get("DATABASE_NAME", "app")
-    SECRET_KEY = (
-        "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"  # tmp
-    )
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
