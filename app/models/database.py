@@ -4,9 +4,11 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import Config
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}",
+    pool_size=Config.DATABASE_POOL_SIZE,
+    max_overflow=Config.DATABASE_MAX_OVERFLOW,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
