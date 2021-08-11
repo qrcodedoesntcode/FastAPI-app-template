@@ -9,7 +9,7 @@ class QuickstartUser(HttpUser):
 
     @task
     def get_all_users(self):
-        self.client.get("/api/v1/user/")
+        self.client.get("/api/v1/admin/user")
 
     @task(2)
     def create_user(self):

@@ -12,7 +12,7 @@ from app.schemas.user import User
 router = APIRouter(prefix="/admin")
 
 
-@router.get("/", response_model=List[User], name="Get all users")
+@router.get("/user", response_model=List[User], name="Get all users")
 def get_users(
     page: int = 1,
     per_page: int = 100,
