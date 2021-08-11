@@ -13,8 +13,8 @@ def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 
-def get_all_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(User).offset(skip).limit(limit).all()
+def get_all_users(db: Session, page: int = 1, per_page: int = 100):
+    return db.query(User).limit(per_page).offset((page - 1) * per_page).all()
 
 
 def create_new_user(db: Session, user: UserCreate):

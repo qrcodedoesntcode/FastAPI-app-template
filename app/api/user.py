@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -9,7 +7,6 @@ from app.core.config import Config
 from app.crud.auth import check_email_is_taken, check_username_is_taken
 from app.crud.user import (
     create_new_user,
-    get_all_users,
     get_user_by_id,
     get_user_by_username,
 )
@@ -21,7 +18,7 @@ router = APIRouter(prefix="/user")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{Config.API_V1_STR}/login")
 
 
-@router.get("/current", response_model=User)
+@router.get("/current", response_model=User, name="Get current user")
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
@@ -44,18 +41,7 @@ def get_current_user(
     return user
 
 
-@router.get("/", response_model=List[User])
-def read_users(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db),
-):
-    users = get_all_users(db, skip=skip, limit=limit)
-
-    return users
-
-
-@router.post("/")
+@router.post("/", name="Create an user")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     if check_username_is_taken(db, user.username):
         raise HTTPException(
@@ -71,8 +57,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_new_user(db=db, user=user)
 
 
-@router.get("/{user_id}", response_model=User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
+@router.get("/{user_id}", response_model=User, name="Get specific user by id")
+def get_specific_user(user_id: int, db: Session = Depends(get_db)):
     db_user = get_user_by_id(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(
