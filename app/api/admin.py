@@ -3,9 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.crud.user import (
-    get_all_users,
-)
+from app.crud.user import get_all_users
 from app.models.database import get_db
 from app.schemas.user import User
 

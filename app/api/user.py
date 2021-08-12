@@ -5,11 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Config
 from app.crud.auth import check_email_is_taken, check_username_is_taken
-from app.crud.user import (
-    create_new_user,
-    get_user_by_id,
-    get_user_by_username,
-)
+from app.crud.user import create_new_user, get_user_by_id, get_user_by_username
 from app.models.database import get_db
 from app.resources import strings
 from app.schemas.user import User, UserCreate
@@ -41,7 +37,7 @@ def get_current_user(
     return user
 
 
-@router.post("/", name="Create an user")
+@router.post("/", name="Create a user")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     if check_username_is_taken(db, user.username):
         raise HTTPException(
