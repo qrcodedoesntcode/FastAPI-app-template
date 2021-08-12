@@ -58,6 +58,6 @@ def get_specific_user(user_id: int, db: Session = Depends(get_db)):
     db_user = get_user_by_id(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail=strings.USER_NOT_FOUND
         )
     return db_user
