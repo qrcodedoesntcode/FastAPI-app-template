@@ -4,6 +4,13 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import Config
 
+from .mixins import PrimaryKeyMixin, TimestampsMixin
+
+
+class BaseFeaturesMixin(PrimaryKeyMixin, TimestampsMixin):
+    __abstract__ = True
+
+
 engine = create_engine(
     f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}",
     pool_size=Config.DATABASE_POOL_SIZE,

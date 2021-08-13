@@ -20,7 +20,7 @@ def get_all_users(db: Session, page: int = 1, per_page: int = 100):
 def create_new_user(db: Session, user: UserCreate):
     db_user = User(
         username=user.username,
-        hashed_password=get_password_hash(user.password),
+        password=get_password_hash(user.password),
         email=user.email,
     )
     db.add(db_user)
@@ -37,6 +37,6 @@ def authenticate_user(db: Session, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
