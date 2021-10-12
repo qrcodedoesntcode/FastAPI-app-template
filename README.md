@@ -37,7 +37,7 @@ $ docker exec -it postgres-app psql -U app
 DELETE FROM alembic_version;
 ```
 
-## Start and dev :
+## Start and dev :
 
 Start the server without docker :
 
