@@ -13,6 +13,7 @@ class BaseFeaturesMixin(PrimaryKeyMixin, TimestampsMixin):
 
 engine = create_engine(
     f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}",
+    pool_pre_ping=True,
     pool_size=Config.DATABASE_POOL_SIZE,
     max_overflow=Config.DATABASE_MAX_OVERFLOW,
 )
