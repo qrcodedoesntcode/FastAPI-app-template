@@ -33,7 +33,9 @@ def get_current_user(
         raise credentials_exception
     user = get_user_by_username(db, username=token_data)
     if user is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=strings.USER_NOT_FOUND
+        )
     return user
 
 
