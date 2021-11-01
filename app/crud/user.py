@@ -41,3 +41,7 @@ def authenticate_user(db: Session, username: str, password: str):
     if not verify_password(password, user.password):
         return False
     return user
+
+
+def is_active(user: User):
+    return user.is_active

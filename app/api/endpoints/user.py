@@ -11,9 +11,8 @@ from app.schemas.user import User, UserCreate
 router = APIRouter(prefix="/user")
 
 
-@router.get("/current", response_model=User, name="Get current user")
+@router.get("/", response_model=User, name="Get current user")
 def get_current_user(current_user: models.User = Depends(deps.get_current_user)):
-
     return current_user
 
 

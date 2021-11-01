@@ -3,8 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from sqlalchemy.orm import Session
 
+from app import models
 from app.core.config import Config
-from app.crud.user import get_user_by_username
+from app.crud.user import get_user_by_username, is_active
 from app.models.database import SessionLocal
 from app.resources import strings
 
@@ -42,3 +43,13 @@ def get_current_user(
         )
 
     return user
+
+
+def get_current_active_user(
+    current_user: models.User = Depends(get_current_user),
+):
+    if not is_active(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=strings.INACTIVE_USER
+        )
+    return current_user
