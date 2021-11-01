@@ -37,7 +37,7 @@ def get_current_user(
     return user
 
 
-@router.post("/", name="Create a user")
+@router.post("/", name="Create a user", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     if check_username_is_taken(db, user.username):
         raise HTTPException(
