@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Config
 from app.crud.auth import crud_create_access_token
 from app.crud.user import authenticate_user
-from app.models.database import get_db
+from app.api.deps import get_db
 from app.schemas.auth import Login
 
 router = APIRouter()
