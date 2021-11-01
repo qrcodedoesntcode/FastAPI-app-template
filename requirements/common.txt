@@ -1,11 +1,11 @@
-fastapi==0.68.0
-uvicorn==0.14.0
+fastapi==0.70.0
+uvicorn==0.15.0
 python-multipart==0.0.5
-SQLAlchemy==1.4.22
+SQLAlchemy==1.4.26
 psycopg2-binary==2.9.1
 passlib==1.7.4
 python-jose==3.3.0
-python-dotenv==0.19.0
+python-dotenv==0.19.1
 bcrypt==3.2.0
 cryptography==3.4.7
 email-validator==1.1.3
