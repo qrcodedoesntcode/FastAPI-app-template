@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, String
+from sqlalchemy.orm import relationship
 
 from .database import Base, BaseFeaturesMixin
-from sqlalchemy.orm import relationship
 
 
 class User(Base, BaseFeaturesMixin):

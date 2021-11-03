@@ -1,6 +1,6 @@
-from .database import Base, BaseFeaturesMixin
+from sqlalchemy import Column, String, Text
 
-from sqlalchemy import Column, String, Text, Integer
+from .database import Base, BaseFeaturesMixin
 
 
 class Role(Base, BaseFeaturesMixin):
