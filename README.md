@@ -26,7 +26,7 @@ DATABASE_NAME=app
 
 ```
 docker build . -f docker/dockerfile.dev -t app-fast-api:dev
-docker run --rm --name fastapi --network fast-api --env-file app/config/.env -it -v $PWD:/app/fast-api/ -p 8000:8000 app-fast-api:dev
+docker run --rm --name fastapi --network fast-api --env-file app/config/.env -it -v $PWD:/app/fast-api/ -p 5555:5555 app-fast-api:dev
 ```
 
 ### Alembic migration

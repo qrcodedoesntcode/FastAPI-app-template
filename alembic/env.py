@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app.core.config import Config
+from app.core.config import settings
 from app.models.database import Base
 from app.models.user import User
 
@@ -27,7 +27,7 @@ target_metadata = Base.metadata
 # ... etc.
 config.set_main_option(
     "sqlalchemy.url",
-    f"postgresql://{Config.DATABASE_USER}:{Config.DATABASE_PASSWORD}@{Config.DATABASE_URL}/{Config.DATABASE_NAME}",
+    f"postgresql://{settings.DATABASE_USER}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_URL}/{settings.DATABASE_NAME}",
 )
 
 

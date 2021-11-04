@@ -4,7 +4,7 @@ from typing import Optional
 from jose import jwt
 from sqlalchemy.orm import Session
 
-from app.core.config import Config
+from app.core.config import settings
 from app.models.user import User
 
 
@@ -15,7 +15,9 @@ def crud_create_access_token(data: dict, expires_delta: Optional[timedelta] = No
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=Config.ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
 
 

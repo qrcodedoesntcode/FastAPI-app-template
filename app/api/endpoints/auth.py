@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.core.config import Config
+from app.core.config import settings
 from app.crud.auth import crud_create_access_token
 from app.crud.user import authenticate_user
 from app.schemas.auth import Login
@@ -24,7 +24,7 @@ def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = crud_create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
