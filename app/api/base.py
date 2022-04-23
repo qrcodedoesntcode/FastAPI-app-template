@@ -1,9 +1,22 @@
-from fastapi import APIRouter
+from enum import Enum
 
-from app.api.endpoints import admin, auth, user
+from fastapi import APIRouter, Depends
 
-router = APIRouter()
+from app.api.endpoints import admin, user
+from app.core.security import check_jwt
 
-router.include_router(auth.router, tags=["Authentication"])
-router.include_router(admin.router, tags=["Admin"])
-router.include_router(user.router, tags=["Users"])
+api_router = APIRouter()
+
+
+def _include_secured_router(router: APIRouter, tags: list[str | Enum]):
+    return api_router.include_router(
+        router, tags=tags, dependencies=[Depends(check_jwt)]
+    )
+
+
+def _include_unsecured_router(router: APIRouter, tags: list[str | Enum]):
+    return api_router.include_router(router, tags=tags)
+
+
+_include_secured_router(admin.router, tags=["Admin"])
+_include_unsecured_router(user.router, tags=["Users"])

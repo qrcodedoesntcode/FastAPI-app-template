@@ -15,10 +15,6 @@ class UserCreate(UserBase):
     email: EmailStr
 
 
-class UserUpdate(UserBase):
-    pass
-
-
 class UserInDBBase(UserBase):
     created_at: datetime = None
     updated_at: datetime = None
@@ -27,7 +23,14 @@ class UserInDBBase(UserBase):
         orm_mode = True
 
 
-class User(UserInDBBase):
+class UserUpdate(UserInDBBase):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class UserSchema(UserInDBBase):
     pass
 
 
