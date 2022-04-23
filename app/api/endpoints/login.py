@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api import deps
-from app.crud.auth import check_email_is_taken, check_username_is_taken
-from app.crud.user import create_new_user
+from app.crud.login import (
+    check_email_is_taken,
+    check_username_is_taken,
+    create_new_user,
+)
 from app.resources import strings
 from app.schemas.user import UserCreate, UserSchema
 
-router = APIRouter(prefix="/user")
+router = APIRouter(prefix="/login")
 
 
 @router.post("/", name="Create a user", response_model=UserSchema)
