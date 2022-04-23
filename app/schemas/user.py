@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -7,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-    is_active: Optional[bool] = None
+    is_active: bool | None = None
 
 
 class UserCreate(UserBase):
@@ -24,10 +23,10 @@ class UserInDBBase(UserBase):
 
 
 class UserUpdate(UserInDBBase):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    is_active: bool | None = None
 
 
 class UserSchema(UserInDBBase):

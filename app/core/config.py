@@ -1,6 +1,6 @@
 import base64
 import os
-from typing import Any, List, Optional
+from typing import Any, List
 
 from pydantic import BaseSettings, validator
 from pydantic.networks import AnyHttpUrl
@@ -14,7 +14,7 @@ class Config(BaseSettings):
     SECRET_KEY: str = str(os.urandom(32))
 
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
-    PROJECT_NAME: Optional[str] = "FastAPI app template"
+    PROJECT_NAME: str | None = "FastAPI app template"
 
     DATABASE_USER: str = "app"
     DATABASE_PASSWORD: str = "password"
