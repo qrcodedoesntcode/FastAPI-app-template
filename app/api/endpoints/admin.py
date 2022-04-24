@@ -13,7 +13,7 @@ router = APIRouter(prefix="/admin")
 IdType = Union[int, str]
 
 
-@router.get("/user", response_model=List[UserSchema], name="Get all users")
+@router.get("/users", response_model=List[UserSchema], name="Get all users")
 def get_users(
     page: int = 1,
     per_page: int = 100,
@@ -25,7 +25,7 @@ def get_users(
 
 
 @router.get(
-    "/{user_id}",
+    "/users/{user_id}",
     response_model=UserSchema,
     name="Get specific user by user_id (id or email)",
 )
@@ -40,7 +40,7 @@ def get_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
 
 
 @router.delete(
-    "/{user_id}",
+    "/users/{user_id}",
     name="Delete specific user by user_id (id or email)",
 )
 def delete_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):

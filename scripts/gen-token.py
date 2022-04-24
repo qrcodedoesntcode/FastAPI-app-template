@@ -17,7 +17,7 @@ if __name__ == "__main__":
         "iat": datetime.datetime.utcnow(),
         "nbf": datetime.datetime.utcnow(),
         "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
-        "sub": "", # Empty for now
+        "sub": "",
         "jti": str(uuid.uuid4())
     }, settings.JWT_SECRET, ALGORITHMS.HS384)
     print(token)
