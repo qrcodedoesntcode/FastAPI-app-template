@@ -20,11 +20,14 @@ class Config(BaseSettings):
     DATABASE_PASSWORD: str = "password"
     DATABASE_URL: str = "127.0.0.1"
     DATABASE_NAME: str = "app"
+    DATABASE_PORT: int = 5432
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
     ALGORITHM = "HS384"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+    USERS_OPEN_REGISTRATION: bool = True
 
     SECRET_KEY: str
 
@@ -44,4 +47,4 @@ class Config(BaseSettings):
         return base64.urlsafe_b64decode(jwt_key)
 
 
-settings = Config(_env_file="config/.env", _env_file_encoding="utf-8")
+settings = Config(_env_file="app/config/.env", _env_file_encoding="utf-8")

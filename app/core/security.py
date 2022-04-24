@@ -15,27 +15,6 @@ from app.schemas.user import UserSchema
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
 
-JWT_OPTIONS = {
-    "verify_signature": True,
-    "verify_aud": False,
-    "verify_iat": True,
-    "verify_exp": True,
-    "verify_nbf": True,
-    "verify_iss": False,
-    "verify_sub": False,
-    "verify_jti": True,
-    "verify_at_hash": False,
-    "require_aud": False,
-    "require_iat": True,
-    "require_exp": True,
-    "require_nbf": True,
-    "require_iss": False,
-    "require_sub": True,
-    "require_jti": True,
-    "require_at_hash": False,
-    "leeway": 0,
-}
-
 
 def get_password_hash(password: str):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode()

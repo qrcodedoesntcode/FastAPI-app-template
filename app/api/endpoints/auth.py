@@ -21,6 +21,11 @@ router = APIRouter(prefix="/auth")
 
 @router.post("/signup", name="Create an account", response_model=UserSchema)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    if not settings.USERS_OPEN_REGISTRATION:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=strings.CLOSED_REGISTRATION,
+        )
     if check_username_is_taken(db, user.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
