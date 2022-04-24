@@ -3,6 +3,7 @@ import datetime
 import os.path
 import sys
 import uuid
+import base64
 
 from jose.constants import ALGORITHMS
 
@@ -13,11 +14,10 @@ from jose import jwt
 from app.core.config import settings
 
 if __name__ == "__main__":
+    jwt_secret = base64.urlsafe_b64decode(settings.JWT_KEY)
+
     token = jwt.encode({
-        "iat": datetime.datetime.utcnow(),
-        "nbf": datetime.datetime.utcnow(),
+        "sub": "antoine",
         "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
-        "sub": "",
-        "jti": str(uuid.uuid4())
-    }, settings.JWT_SECRET, ALGORITHMS.HS384)
+    }, jwt_secret, ALGORITHMS.HS384)
     print(token)

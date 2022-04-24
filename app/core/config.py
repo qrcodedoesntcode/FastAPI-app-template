@@ -11,8 +11,6 @@ class Config(BaseSettings):
 
     API_V1_STR = "/api/v1"
 
-    SECRET_KEY: str = str(os.urandom(32))
-
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     PROJECT_NAME: str | None = "FastAPI app template"
 
@@ -29,22 +27,7 @@ class Config(BaseSettings):
 
     USERS_OPEN_REGISTRATION: bool = True
 
-    SECRET_KEY: str
-
     JWT_KEY: str
-    JWT_SECRET: str | None
-
-    @validator("JWT_SECRET")
-    def build_jwt_secret(cls, v: str | None, values: dict[str, Any]):
-        if v:
-            return v
-
-        jwt_key = values.get("JWT_KEY")
-
-        if not jwt_key:
-            return ""
-
-        return base64.urlsafe_b64decode(jwt_key)
 
 
 settings = Config(_env_file="app/config/.env", _env_file_encoding="utf-8")
