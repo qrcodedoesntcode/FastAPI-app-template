@@ -2,7 +2,7 @@ from enum import Enum
 
 from fastapi import APIRouter, Depends
 
-from app.api.endpoints import admin, login
+from app.api.endpoints import admin, auth
 from app.core.security import check_jwt
 
 api_router = APIRouter()
@@ -19,4 +19,4 @@ def _include_unsecured_router(router: APIRouter, tags: list[str | Enum]):
 
 
 _include_secured_router(admin.router, tags=["Admin"])
-_include_unsecured_router(login.router, tags=["Login"])
+_include_unsecured_router(auth.router, tags=["Auth"])
