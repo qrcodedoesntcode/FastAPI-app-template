@@ -14,12 +14,12 @@ IdType = Union[int, str]
 
 
 @router.get("/users", response_model=List[UserSchema], name="Get all users")
-def get_users(
+async def get_users(
     page: int = 1,
     per_page: int = 100,
     db: Session = Depends(get_db),
 ):
-    users = get_all_users(db, page=page, per_page=per_page)
+    users = await get_all_users(db, page=page, per_page=per_page)
 
     return users
 
@@ -29,8 +29,8 @@ def get_users(
     response_model=UserSchema,
     name="Get specific user by user_id (id or email)",
 )
-def get_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
-    db_user = get_user_by_user_id(db, user_id)
+async def get_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
+    db_user = await get_user_by_user_id(db, user_id)
 
     if db_user is None:
         raise HTTPException(
@@ -43,5 +43,5 @@ def get_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
     "/users/{user_id}",
     name="Delete specific user by user_id (id or email)",
 )
-def delete_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
-    return delete_user_by_user_id(db, user_id)
+async def delete_specific_user(user_id: IdType, db: Session = Depends(deps.get_db)):
+    return await delete_user_by_user_id(db, user_id)

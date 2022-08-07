@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash
@@ -5,15 +6,19 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 
-def check_username_is_taken(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+async def check_username_is_taken(db: Session, username: str):
+    stmt = select(User).where(User.username == username)
+    result = await db.execute(stmt)
+    return result.scalars().first()
 
 
-def check_email_is_taken(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+async def check_email_is_taken(db: Session, email: str):
+    stmt = select(User).where(User.email == email)
+    result = await db.execute(stmt)
+    return result.scalars().first()
 
 
-def create_new_user(db: Session, user: UserCreate):
+async def create_new_user(db: Session, user: UserCreate):
     db_user = User(
         username=user.username,
         password=get_password_hash(user.password),
@@ -21,6 +26,5 @@ def create_new_user(db: Session, user: UserCreate):
         is_active=user.is_active,
     )
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    await db.commit()
     return db_user

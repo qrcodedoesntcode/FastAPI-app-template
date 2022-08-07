@@ -20,31 +20,31 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post("/signup", name="Create an account", response_model=UserSchema)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     if not settings.USERS_OPEN_REGISTRATION:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=strings.CLOSED_REGISTRATION,
         )
-    if check_username_is_taken(db, user.username):
+    if await check_username_is_taken(db, user.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.USERNAME_TAKEN,
         )
 
-    if check_email_is_taken(db, user.email):
+    if await check_email_is_taken(db, user.email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=strings.EMAIL_TAKEN,
         )
-    return create_new_user(db=db, user=user)
+    return await create_new_user(db=db, user=user)
 
 
 @router.post("/login", response_model=Token)
-def login_for_access_token(
+async def login_for_access_token(
     db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
