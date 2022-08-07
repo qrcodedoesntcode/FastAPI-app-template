@@ -1,8 +1,6 @@
-import base64
-import os
-from typing import Any, List
+from typing import List
 
-from pydantic import BaseSettings, validator
+from pydantic import BaseSettings
 from pydantic.networks import AnyHttpUrl
 
 

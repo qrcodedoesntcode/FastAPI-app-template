@@ -1,9 +1,9 @@
 #!/usr/bin/env python
+import base64
 import datetime
 import os.path
 import sys
 import uuid
-import base64
 
 from jose.constants import ALGORITHMS
 
