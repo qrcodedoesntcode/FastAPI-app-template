@@ -10,6 +10,7 @@ from starlette import status
 from app.api.deps import get_db
 from app.core.config import settings
 from app.crud.admin import get_user_by_username
+from app.resources import strings
 from app.schemas.auth import TokenData
 from app.schemas.user import UserSchema
 
@@ -67,6 +68,6 @@ def check_jwt(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail=strings.INACTIVE_USER
         )
     return current_user
