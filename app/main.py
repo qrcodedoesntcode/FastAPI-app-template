@@ -10,7 +10,7 @@ app = FastAPI(
     version=settings.APP_VERSION,
     docs_url=None if settings.FASTAPI_ENV == "prod" else "/docs",
     redoc_url=None if settings.FASTAPI_ENV == "prod" else "/redoc",
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
 
 # CORS

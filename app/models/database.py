@@ -1,6 +1,6 @@
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from app.core.config import settings
 
@@ -18,6 +18,12 @@ engine = create_async_engine(
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     future=True,
 )
-async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession, future=True, autoflush=False)
+async_session = sessionmaker(
+    bind=engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+    future=True,
+    autoflush=False,
+)
 
 Base = declarative_base()
