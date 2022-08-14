@@ -2,7 +2,7 @@ from typing import Union
 
 from fastapi import HTTPException, status
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
 from app.resources import strings
@@ -10,7 +10,7 @@ from app.resources import strings
 IdType = Union["int", "str"]
 
 
-async def get_user_by_user_id(db: Session, user_id: IdType):
+async def get_user_by_user_id(db: AsyncSession, user_id: IdType):
     if isinstance(user_id, int):
         stmt = select(User).where(User.id == user_id)
         result = await db.execute(stmt)
@@ -21,7 +21,7 @@ async def get_user_by_user_id(db: Session, user_id: IdType):
     return result.scalars().first()
 
 
-async def get_user_by_username(db: Session, username: str):
+async def get_user_by_username(db: AsyncSession, username: str):
     stmt = select(User).filter(User.username == username)
     result = await db.execute(stmt)
     return result.scalars().first()
