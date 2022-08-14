@@ -77,7 +77,7 @@ async def check_jwt(
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -100,6 +100,11 @@ async def check_jwt(
 
 
 def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
+        )
     if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=strings.INACTIVE_USER
