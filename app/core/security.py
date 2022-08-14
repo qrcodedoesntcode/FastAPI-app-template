@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 
 import bcrypt
@@ -15,6 +16,28 @@ from app.schemas.auth import TokenData
 from app.schemas.user import UserSchema
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
+
+
+JWT_OPTIONS = {
+    "verify_signature": True,
+    "verify_aud": False,
+    "verify_iat": True,
+    "verify_exp": True,
+    "verify_nbf": False,
+    "verify_iss": True,
+    "verify_sub": True,
+    "verify_jti": True,
+    "verify_at_hash": False,
+    "require_aud": False,
+    "require_iat": True,
+    "require_exp": True,
+    "require_nbf": False,
+    "require_iss": True,
+    "require_sub": True,
+    "require_jti": True,
+    "require_at_hash": False,
+    "leeway": 0,
+}
 
 
 def get_password_hash(password: str):
@@ -40,7 +63,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    iat = datetime.utcnow()
+    iss = settings.PROJECT_NAME
+    jti = str(uuid.uuid4())
+
+    to_encode.update({"exp": expire, "iat": iat, "iss": iss, "jti": jti})
     encoded_jwt = jwt.encode(to_encode, settings.JWT_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
@@ -54,7 +81,12 @@ async def check_jwt(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.JWT_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token,
+            settings.JWT_KEY,
+            algorithms=[settings.ALGORITHM],
+            options=JWT_OPTIONS,
+        )
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
