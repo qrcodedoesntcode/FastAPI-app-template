@@ -10,6 +10,7 @@ from starlette import status
 
 from app.api.deps import get_db
 from app.core.config import settings
+from app.core.logger import logger
 from app.crud.admin import get_user_by_username
 from app.resources import strings
 from app.schemas.auth import TokenData
@@ -54,6 +55,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
         return False
     if not verify_password(password, user.password):
         return False
+    logger.info(f"Authenticating user {username}")
     return user
 
 
@@ -69,6 +71,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
     to_encode.update({"exp": expire, "iat": iat, "iss": iss, "jti": jti})
     encoded_jwt = jwt.encode(to_encode, settings.JWT_KEY, algorithm=settings.ALGORITHM)
+    logger.debug(f"Creating access token for user {data['sub']}")
     return encoded_jwt
 
 

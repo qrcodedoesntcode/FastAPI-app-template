@@ -24,6 +24,8 @@ class Config(BaseSettings):
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
+    LOGGING_LEVEL: str = "INFO"
+
     ALGORITHM = "HS384"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
