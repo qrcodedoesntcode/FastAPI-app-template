@@ -2,7 +2,7 @@ from enum import Enum
 
 from fastapi import APIRouter, Depends
 
-from app.api.endpoints import admin, auth
+from app.api.endpoints.v1 import admin, auth
 from app.core.security import get_current_active_user
 
 api_router = APIRouter()
