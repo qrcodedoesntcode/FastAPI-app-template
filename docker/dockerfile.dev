@@ -1,4 +1,4 @@
-FROM python:3.10.5
+FROM python:3.10.6
 LABEL maintainer="chichi13"
 
 # Keeping the image up to date and installing node 15
