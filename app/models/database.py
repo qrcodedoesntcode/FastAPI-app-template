@@ -12,7 +12,11 @@ class BaseFeaturesMixin(PrimaryKeyMixin, TimestampsMixin):
 
 
 engine = create_async_engine(
-    f"postgresql+asyncpg://{settings.DATABASE_USER}:{settings.DATABASE_PASSWORD}@{settings.DATABASE_URL}/{settings.DATABASE_NAME}",
+    f"""postgresql+asyncpg://
+    {settings.DATABASE_USER}:
+    {settings.DATABASE_PASSWORD}@
+    {settings.DATABASE_URL}/
+    {settings.DATABASE_NAME}""",
     pool_pre_ping=True,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,

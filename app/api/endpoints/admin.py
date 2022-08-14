@@ -43,5 +43,7 @@ async def get_specific_user(user_id: IdType, db: AsyncSession = Depends(deps.get
     "/users/{user_id}",
     name="Delete specific user by user_id (id or email)",
 )
-async def delete_specific_user(user_id: IdType, db: AsyncSession = Depends(deps.get_db)):
+async def delete_specific_user(
+    user_id: IdType, db: AsyncSession = Depends(deps.get_db)
+):
     return await delete_user_by_user_id(db, user_id)
