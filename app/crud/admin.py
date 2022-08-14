@@ -1,7 +1,7 @@
 from typing import Union
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -27,10 +27,8 @@ async def get_user_by_username(db: Session, username: str):
     return result.scalars().first()
 
 
-async def get_all_users(db: Session, page: int = 1, per_page: int = 100):
-    stmt = select(User).offset(per_page * (page - 1)).limit(per_page)
-    result = await db.execute(stmt)
-    return result.scalars().all()
+def get_all_users():
+    return select(User)
 
 
 async def delete_user_by_user_id(db, user_id: IdType):
