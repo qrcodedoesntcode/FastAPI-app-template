@@ -1,27 +1,17 @@
 #!/usr/bin/env python
-import base64
-import datetime
 import os.path
 import sys
-import uuid
-
-from jose.constants import ALGORITHMS
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from jose import jwt
+from datetime import timedelta
 
-from app.core.config import settings
+from app.core.security import create_access_token
 
 if __name__ == "__main__":
-    jwt_secret = base64.urlsafe_b64decode(settings.JWT_KEY)
-
-    token = jwt.encode(
-        {
-            "sub": "antoine",
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
-        },
-        jwt_secret,
-        ALGORITHMS.HS384,
+    access_token_expires = timedelta(days=1)
+    encoded_jwt = create_access_token(
+        data={"sub": "antoine"}, expires_delta=access_token_expires
     )
-    print(token)
+
+    print(encoded_jwt)
