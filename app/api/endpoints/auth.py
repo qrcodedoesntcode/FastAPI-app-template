@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.core.config import settings
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post("/signup", name="Create an account", response_model=UserSchema)
-async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     if not settings.USERS_OPEN_REGISTRATION:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -42,7 +42,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login_for_access_token(
-    db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
+    db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
