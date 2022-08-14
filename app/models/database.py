@@ -11,12 +11,16 @@ class BaseFeaturesMixin(PrimaryKeyMixin, TimestampsMixin):
     __abstract__ = True
 
 
+SQLALCHEMY_DATABASE_URI = "postgresql+asyncpg://{0}:{1}@{2}:{3}/{4}".format(
+    settings.DATABASE_USER,
+    settings.DATABASE_PASSWORD,
+    settings.DATABASE_URL,
+    settings.DATABASE_PORT,
+    settings.DATABASE_NAME,
+)
+
 engine = create_async_engine(
-    f"""postgresql+asyncpg://
-    {settings.DATABASE_USER}:
-    {settings.DATABASE_PASSWORD}@
-    {settings.DATABASE_URL}/
-    {settings.DATABASE_NAME}""",
+    SQLALCHEMY_DATABASE_URI,
     pool_pre_ping=True,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
