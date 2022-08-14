@@ -1,8 +1,8 @@
 from typing import Union
 
 from fastapi import HTTPException, status
-from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from app.models.user import User
 from app.resources import strings
