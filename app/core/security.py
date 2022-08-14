@@ -16,7 +16,7 @@ from app.resources import strings
 from app.schemas.auth import TokenData
 from app.schemas.user import UserSchema
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
 
 JWT_OPTIONS = {
@@ -59,7 +59,9 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_jwt_token(
+    data: dict, expires_delta: timedelta | None = None, scope: str = "access_token"
+):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -69,14 +71,23 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     iss = settings.PROJECT_NAME
     jti = str(uuid.uuid4())
 
-    to_encode.update({"exp": expire, "iat": iat, "iss": iss, "jti": jti})
-    encoded_jwt = jwt.encode(to_encode, settings.JWT_KEY, algorithm=settings.ALGORITHM)
-    logger.debug(f"Creating access token for user {data['sub']}")
+    jwt_key = (
+        settings.JWT_ACCESS_TOKEN_KEY
+        if scope == "access_token"
+        else settings.JWT_REFRESH_TOKEN_KEY
+    )
+    to_encode.update(
+        {"exp": expire, "iat": iat, "iss": iss, "jti": jti, "scope": scope}
+    )
+    encoded_jwt = jwt.encode(to_encode, jwt_key, algorithm=settings.ALGORITHM)
+    logger.debug(f"Creating {scope} for user {data['sub']}")
     return encoded_jwt
 
 
 async def check_jwt(
-    db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)
+    db: AsyncSession = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+    scope: str = "access_token",
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -84,9 +95,14 @@ async def check_jwt(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        jwt_key = (
+            settings.JWT_ACCESS_TOKEN_KEY
+            if scope == "access_token"
+            else settings.JWT_REFRESH_TOKEN_KEY
+        )
         payload = jwt.decode(
             token,
-            settings.JWT_KEY,
+            jwt_key,
             algorithms=[settings.ALGORITHM],
             options=JWT_OPTIONS,
         )
@@ -96,10 +112,10 @@ async def check_jwt(
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user_by_username(db, username=token_data.username)
+    user = await get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
-    return await user
+    return user
 
 
 def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
@@ -113,3 +129,7 @@ def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
             status_code=status.HTTP_400_BAD_REQUEST, detail=strings.INACTIVE_USER
         )
     return current_user
+
+
+def validate_refresh_token(db: AsyncSession, token: str = Depends(oauth2_scheme)):
+    return check_jwt(db, token, "refresh_token")

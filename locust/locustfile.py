@@ -3,7 +3,7 @@ import random
 
 from locust import HttpUser, between, task
 
-jwt_token = "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbnRvaW5lIiwiZXhwIjoxNjU5ODk1ODgyfQ.uY6A87_8A6KN_DZcE7T-qmSCRDW4-7IUVwnEdRDQooRLDyOuEx7LCjqpWqcjz1xe"
+jwt_token = "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbnRvaW5lIiwiZXhwIjoxNjYwNTcwODAxLCJpYXQiOjE2NjA0ODQ0MDEsImlzcyI6IkZhc3RBUEkgYXBwIHRlbXBsYXRlIiwianRpIjoiZmZhNTZmY2MtYzcyNi00ZDRmLThjNzUtNTk0NTA5NDZlY2MzIn0.tvDCh8pRANFh4XFirJ3Gk1N55jQNJOwJRrYVCVYN5Xe3HcS2dGp2mrB47FNR2gAS"
 
 
 class QuickstartUser(HttpUser):

@@ -27,11 +27,13 @@ class Config(BaseSettings):
     LOGGING_LEVEL: str = "INFO"
 
     ALGORITHM = "HS384"
-    ACCESS_TOKEN_EXPIRE_MINUTES = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES = 15
+    REFRESH_TOKEN_EXPIRE_MINUTES = 10_080
 
     USERS_OPEN_REGISTRATION: bool = True
 
-    JWT_KEY: str
+    JWT_ACCESS_TOKEN_KEY: str
+    JWT_REFRESH_TOKEN_KEY: str
 
 
 settings = Config(_env_file="app/config/.env", _env_file_encoding="utf-8")
