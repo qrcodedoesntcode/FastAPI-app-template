@@ -1,7 +1,14 @@
 from typing import List
+from enum import Enum
 
 from pydantic import BaseSettings
 from pydantic.networks import AnyHttpUrl
+
+
+class AppEnvironment(str, Enum):
+    PRODUCTION = "production"
+    DEV = "development"
+    TESTING = "testing"
 
 
 class Config(BaseSettings):
@@ -10,7 +17,10 @@ class Config(BaseSettings):
     API_V1_STR = "/api/v1"
 
     APP_VERSION: str = "Unversioned API"
-    FASTAPI_ENV: str = "prod"
+    FASTAPI_ENV: AppEnvironment = AppEnvironment.PRODUCTION
+
+    UVICORN_HOST: str = "0.0.0.0"
+    UVICORN_PORT: int = 8000
 
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     PROJECT_NAME: str | None = "FastAPI app template"
@@ -33,6 +43,12 @@ class Config(BaseSettings):
 
     JWT_ACCESS_TOKEN_KEY: str
     JWT_REFRESH_TOKEN_KEY: str
+
+    def is_dev(self):
+        return self.FASTAPI_ENV == AppEnvironment.DEV
+
+    def is_prod(self):
+        return self.FASTAPI_ENV == AppEnvironment.PRODUCTION
 
 
 settings = Config(_env_file="app/config/.env", _env_file_encoding="utf-8")
