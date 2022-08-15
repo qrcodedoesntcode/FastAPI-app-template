@@ -42,42 +42,25 @@ JWT_OPTIONS = {
 }
 
 
-def get_password_hash(password: str):
+def get_password_hash(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode()
 
 
-def verify_password(password: str, password_hash: str):
+def verify_password(password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
 
-def add_token_to_blacklist(token: str, scope: str = "refresh_token"):
-    """
-    Add token to the blacklist.
-    Added the possibility to blacklist a token by scope (refresh_token, access_token).
-    """
-    jwt_key = (
-        settings.JWT_ACCESS_TOKEN_KEY
-        if scope == "access_token"
-        else settings.JWT_REFRESH_TOKEN_KEY
-    )
-    payload = jwt.decode(
-        token,
-        jwt_key,
-        algorithms=[settings.ALGORITHM],
-        options=JWT_OPTIONS,
-    )
-    jti = payload.get("jti")
-    exp = payload.get("exp")
-    storage.set_key(jti, exp)
-    logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
-
-
-async def authenticate_user(db: AsyncSession, username: str, password: str):
+async def check_user_auth(db: AsyncSession, username: str, password: str):
     user = await get_user_by_username(db, username)
+    credentials_error = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=strings.INCORRECT_USER_PASSWORD,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     if not user:
-        return False
+        raise credentials_error
     if not verify_password(password, user.password):
-        return False
+        raise credentials_error
     logger.info(f"Authenticating user {username}")
     return user
 
@@ -146,7 +129,9 @@ async def check_jwt(
     return user
 
 
-def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
+def get_current_active_user(
+    current_user: UserSchema = Depends(check_jwt),
+) -> UserSchema:
     if current_user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -161,3 +146,45 @@ def get_current_active_user(current_user: UserSchema = Depends(check_jwt)):
 
 def validate_refresh_token(db: AsyncSession, token: str = Depends(oauth2_scheme)):
     return check_jwt(db, token, "refresh_token")
+
+
+def add_token_to_blacklist(token: str, scope: str = "refresh_token") -> None:
+    """
+    Add token to the blacklist.
+    Added the possibility to blacklist a token by scope (refresh_token, access_token).
+    """
+    jwt_key = (
+        settings.JWT_ACCESS_TOKEN_KEY
+        if scope == "access_token"
+        else settings.JWT_REFRESH_TOKEN_KEY
+    )
+    payload = jwt.decode(
+        token,
+        jwt_key,
+        algorithms=[settings.ALGORITHM],
+        options=JWT_OPTIONS,
+    )
+    jti = payload.get("jti")
+    exp = payload.get("exp")
+    storage.set_key(jti, exp)
+    logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
+
+
+def generate_access_refresh_token(user) -> dict:
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_jwt_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+
+    refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    refresh_token = create_jwt_token(
+        data={"sub": user.username},
+        expires_delta=refresh_token_expires,
+        scope="refresh_token",
+    )
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }

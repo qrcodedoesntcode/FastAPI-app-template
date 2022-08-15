@@ -5,7 +5,7 @@ from app.api.base import api_router
 from app.core.config import settings
 
 
-def create_app():
+def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version=settings.APP_VERSION,
@@ -22,7 +22,7 @@ def setup_routers(app: FastAPI) -> None:
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-def setup_middlewares(app):
+def setup_middlewares(app) -> None:
     # CORS
     origins = []
 

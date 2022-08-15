@@ -6,7 +6,7 @@ from app.core.config import settings
 
 
 class LocalStorage:
-    def __init__(self):
+    def __init__(self) -> None:
         self.storage = {}
 
     def __contains__(self, key_name):

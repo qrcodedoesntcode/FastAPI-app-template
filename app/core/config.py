@@ -49,10 +49,10 @@ class Config(BaseSettings):
     JWT_ACCESS_TOKEN_KEY: str
     JWT_REFRESH_TOKEN_KEY: str
 
-    def is_dev(self):
+    def is_dev(self) -> bool:
         return self.FASTAPI_ENV == AppEnvironment.DEV
 
-    def is_prod(self):
+    def is_prod(self) -> bool:
         return self.FASTAPI_ENV == AppEnvironment.PRODUCTION
 
 

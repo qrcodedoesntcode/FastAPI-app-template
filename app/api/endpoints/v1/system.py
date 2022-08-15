@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,12 +9,12 @@ router = APIRouter()
 
 
 @router.get("/", response_model=Root)
-def root():
+def root() -> dict:
     return {"name": f"{settings.PROJECT_NAME}", "version": f"{settings.APP_VERSION}"}
 
 
 @router.get("/health", response_model=Health)
-async def get_health(db: AsyncSession = Depends(get_db)) -> Any:
+async def get_health(db: AsyncSession = Depends(get_db)) -> dict:
     try:
         healthy = await db.execute("SELECT 1")
         if healthy.scalars().first() is None:

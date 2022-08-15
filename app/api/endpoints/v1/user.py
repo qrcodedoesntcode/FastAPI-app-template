@@ -7,5 +7,5 @@ router = APIRouter(prefix="/users")
 
 
 @router.get("/profile", response_model=UserSchema, name="Get current user")
-def profile(current_user: UserSchema = Depends(get_current_active_user)):
+def profile(current_user: UserSchema = Depends(get_current_active_user)) -> UserSchema:
     return current_user
