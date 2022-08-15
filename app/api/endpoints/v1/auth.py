@@ -7,13 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_db
 from app.core.config import settings
 from app.core.security import (
+    add_token_to_blacklist,
     authenticate_user,
     create_jwt_token,
     validate_refresh_token,
 )
 from app.crud.auth import check_email_is_taken, check_username_is_taken, create_new_user
 from app.resources import strings
-from app.schemas.auth import RefreshToken, Token
+from app.schemas.auth import Message, RefreshToken, Token
 from app.schemas.user import UserCreate, UserSchema
 
 router = APIRouter(prefix="/auth")
@@ -85,8 +86,16 @@ async def refresh_token(
 
     access_token, refresh_token = _generate_access_refresh_token(user)
 
+    add_token_to_blacklist(form_data.refresh_token)
+
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
+
+
+@router.post("/logout", name="Logout", response_model=Message)
+async def logout():
+    # Remove access_token/refresh_token from the frontend
+    return {"msg": "Successfully logged out"}

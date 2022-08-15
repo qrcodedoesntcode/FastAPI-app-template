@@ -13,3 +13,7 @@ class RefreshToken(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class Message(BaseModel):
+    msg: str

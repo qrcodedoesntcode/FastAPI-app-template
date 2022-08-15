@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 
 import bcrypt
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,6 +39,7 @@ JWT_OPTIONS = {
     "require_at_hash": False,
     "leeway": 0,
 }
+blacklist = set()
 
 
 def get_password_hash(password: str):
@@ -47,6 +48,27 @@ def get_password_hash(password: str):
 
 def verify_password(password: str, password_hash: str):
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+
+
+def add_token_to_blacklist(token: str, scope: str = "refresh_token"):
+    """
+    Add token to the blacklist.
+    Added the possibility to blacklist a token by scope (refresh_token, access_token).
+    """
+    jwt_key = (
+        settings.JWT_ACCESS_TOKEN_KEY
+        if scope == "access_token"
+        else settings.JWT_REFRESH_TOKEN_KEY
+    )
+    jti = jwt.decode(
+        token,
+        jwt_key,
+        algorithms=[settings.ALGORITHM],
+        options=JWT_OPTIONS,
+    )["jti"]
+    blacklist.add(jti)
+    # Todo : add Redis connection to store the blacklist
+    logger.info(f"Adding {jti} to blacklist")
 
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
@@ -87,7 +109,7 @@ def create_jwt_token(
 async def check_jwt(
     db: AsyncSession = Depends(get_db),
     token: str = Depends(oauth2_scheme),
-    scope: str = "access_token",
+    scope: str = Query(default="access_token", include_in_schema=False),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -106,8 +128,13 @@ async def check_jwt(
             algorithms=[settings.ALGORITHM],
             options=JWT_OPTIONS,
         )
+        jti: str = payload.get("jti")
         username: str = payload.get("sub")
+        if jti in blacklist:
+            logger.debug(f"{jti} is in blacklist")
+            raise credentials_exception
         if username is None:
+            logger.debug("sub is None")
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:

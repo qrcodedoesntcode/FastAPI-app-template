@@ -25,7 +25,7 @@ engine = create_async_engine(
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     future=True,
-    echo=True if settings.DEBUG else False,
+    echo=True if settings.LOGGING_LEVEL == "DEBUG" else False,
 )
 async_session = sessionmaker(
     bind=engine,

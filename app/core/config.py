@@ -11,7 +11,6 @@ class Config(BaseSettings):
 
     APP_VERSION: str = "Unversioned API"
     FASTAPI_ENV: str = "prod"
-    DEBUG: bool = False
 
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     PROJECT_NAME: str | None = "FastAPI app template"

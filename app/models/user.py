@@ -9,4 +9,4 @@ class User(Base, BaseFeaturesMixin):
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=False)
