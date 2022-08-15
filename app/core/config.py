@@ -1,5 +1,5 @@
-from typing import List
 from enum import Enum
+from typing import List
 
 from pydantic import BaseSettings
 from pydantic.networks import AnyHttpUrl
@@ -32,6 +32,11 @@ class Config(BaseSettings):
     DATABASE_PORT: int = 5432
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
+
+    REDIS_CONNECTION: bool = True
+    REDIS_URL: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_SOCKET_TIMEOUT: int = 5
 
     LOGGING_LEVEL: str = "INFO"
 

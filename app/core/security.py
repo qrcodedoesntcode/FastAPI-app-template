@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.core.logger import logger
 from app.crud.admin import get_user_by_username
 from app.resources import strings
+from app.resources.storage_method import storage
 from app.schemas.auth import TokenData
 from app.schemas.user import UserSchema
 
@@ -39,7 +40,6 @@ JWT_OPTIONS = {
     "require_at_hash": False,
     "leeway": 0,
 }
-blacklist = set()
 
 
 def get_password_hash(password: str):
@@ -60,15 +60,16 @@ def add_token_to_blacklist(token: str, scope: str = "refresh_token"):
         if scope == "access_token"
         else settings.JWT_REFRESH_TOKEN_KEY
     )
-    jti = jwt.decode(
+    payload = jwt.decode(
         token,
         jwt_key,
         algorithms=[settings.ALGORITHM],
         options=JWT_OPTIONS,
-    )["jti"]
-    blacklist.add(jti)
-    # Todo : add Redis connection to store the blacklist
-    logger.info(f"Adding {jti} to blacklist")
+    )
+    jti = payload.get("jti")
+    exp = payload.get("exp")
+    storage.set_key(jti, exp)
+    logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
 
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
@@ -130,7 +131,7 @@ async def check_jwt(
         )
         jti: str = payload.get("jti")
         username: str = payload.get("sub")
-        if jti in blacklist:
+        if jti in storage:
             logger.debug(f"{jti} is in blacklist")
             raise credentials_exception
         if username is None:

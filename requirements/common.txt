@@ -10,3 +10,4 @@ bcrypt==3.2.2
 cryptography==37.0.4
 email-validator==1.2.1
 fastapi_pagination==0.9.3
+redis==4.3.4
