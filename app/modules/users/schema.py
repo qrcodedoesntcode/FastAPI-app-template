@@ -1,16 +1,16 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
 
 
 class UserBase(BaseModel):
-    username: str
+    username: constr(to_lower=True, min_length=4, max_length=20, strip_whitespace=True)
     email: EmailStr
     is_active: bool | None = None
 
 
 class UserCreate(UserBase):
-    password: str
+    password: constr(min_length=8)
     email: EmailStr
 
 
@@ -23,9 +23,11 @@ class UserInDBBase(UserBase):
 
 
 class UserUpdate(UserInDBBase):
-    username: str | None = None
+    username: constr(
+        to_lower=True, min_length=4, max_length=20, strip_whitespace=True
+    ) | None = None
     email: EmailStr | None = None
-    password: str | None = None
+    password: constr(min_length=8) | None = None
     is_active: bool | None = None
 
 
@@ -34,4 +36,4 @@ class UserSchema(UserInDBBase):
 
 
 class UserInDB(UserInDBBase):
-    password: str
+    password: constr(min_length=8)

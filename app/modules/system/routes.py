@@ -1,19 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.schema import DefaultResponse
 from app.db.deps import get_db
-from app.modules.system.schema import Health, Root
 
 router = APIRouter()
 
 
-@router.get("/", response_model=Root)
+@router.get("/", status_code=status.HTTP_200_OK, response_model=DefaultResponse)
 def root() -> dict:
-    return {"name": f"{settings.PROJECT_NAME}", "version": f"{settings.APP_VERSION}"}
+    return {
+        "status": True,
+        "msg": "Project information",
+        "details": {
+            "name": f"{settings.PROJECT_NAME}",
+            "version": f"{settings.APP_VERSION}",
+        },
+    }
 
 
-@router.get("/health", response_model=Health)
+@router.get("/health", status_code=status.HTTP_200_OK, response_model=DefaultResponse)
 async def get_health(db: AsyncSession = Depends(get_db)) -> dict:
     try:
         healthy = await db.execute("SELECT 1")
@@ -22,4 +29,4 @@ async def get_health(db: AsyncSession = Depends(get_db)) -> dict:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return {"msg": "Healthy ✅"}
+    return {"status": True, "msg": "Healthy ✅"}
