@@ -56,4 +56,4 @@ class Config(BaseSettings):
         return self.FASTAPI_ENV == AppEnvironment.PRODUCTION
 
 
-settings = Config(_env_file="app/config/.env", _env_file_encoding="utf-8")
+settings = Config(_env_file=".env", _env_file_encoding="utf-8")

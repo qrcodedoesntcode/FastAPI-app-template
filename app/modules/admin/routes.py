@@ -6,11 +6,15 @@ from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
-from app.api.deps import get_db
 from app.core.params_paginate import Page
-from app.crud.admin import delete_user_by_user_id, get_all_users, get_user_by_user_id
-from app.schemas.user import UserSchema
+from app.db import deps
+from app.db.deps import get_db
+from app.modules.admin.crud import (
+    delete_user_by_user_id,
+    get_all_users,
+    get_user_by_user_id,
+)
+from app.modules.users.schema import UserSchema
 
 router = APIRouter(prefix="/admin")
 IdType = Union[int, str]

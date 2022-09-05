@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, String
 
-from .database import Base, BaseFeaturesMixin
+from app.db.database import Base, BaseFeaturesMixin
 
 
 class User(Base, BaseFeaturesMixin):

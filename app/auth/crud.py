@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.core.security import get_password_hash
-from app.models.user import User
-from app.resources import strings
-from app.schemas.user import UserCreate
+from app.modules.users.models import User
+from app.modules.users.schema import UserCreate
+from app.services import strings
 
 
 async def check_username_is_taken(db: AsyncSession, username: str) -> bool:
