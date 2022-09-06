@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 
 class Token(BaseModel):
@@ -12,7 +12,9 @@ class RefreshToken(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    username: constr(
+        to_lower=True, min_length=4, max_length=20, strip_whitespace=True
+    ) | None = None
 
 
 class Message(BaseModel):

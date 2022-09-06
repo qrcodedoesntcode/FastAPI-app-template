@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db
+from app.auth.crud import check_email_is_taken, check_username_is_taken, create_new_user
+from app.auth.schema import Message, RefreshToken, Token
 from app.core.config import settings
 from app.core.security import (
     add_token_to_blacklist,
@@ -10,15 +11,19 @@ from app.core.security import (
     generate_access_refresh_token,
     validate_refresh_token,
 )
-from app.crud.auth import check_email_is_taken, check_username_is_taken, create_new_user
-from app.resources import strings
-from app.schemas.auth import Message, RefreshToken, Token
-from app.schemas.user import UserCreate, UserSchema
+from app.db.deps import get_db
+from app.modules.users.schema import UserCreate, UserSchema
+from app.services import strings
 
 router = APIRouter(prefix="/auth")
 
 
-@router.post("/signup", response_model=UserSchema, name="Create an account")
+@router.post(
+    "/signup",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserSchema,
+    name="Create an account",
+)
 async def create_user(
     user: UserCreate, db: AsyncSession = Depends(get_db)
 ) -> UserSchema:
@@ -33,7 +38,12 @@ async def create_user(
     return await create_new_user(db=db, user=user)
 
 
-@router.post("/token", response_model=Token, name="Get an access/refresh token")
+@router.post(
+    "/token",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Token,
+    name="Get an access/refresh token",
+)
 async def login_for_access_token(
     db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> dict:
@@ -42,7 +52,12 @@ async def login_for_access_token(
     return generate_access_refresh_token(user)
 
 
-@router.post("/refresh_token", response_model=Token, name="Refresh an access token")
+@router.post(
+    "/refresh_token",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Token,
+    name="Refresh an access token",
+)
 async def refresh_token(
     db: AsyncSession = Depends(get_db), form_data: RefreshToken = Depends()
 ) -> dict:
@@ -55,7 +70,9 @@ async def refresh_token(
     return tokens
 
 
-@router.post("/logout", name="Logout", response_model=Message)
+@router.post(
+    "/logout", status_code=status.HTTP_200_OK, name="Logout", response_model=Message
+)
 async def logout() -> dict:
     # Remove access_token/refresh_token from the frontend
     return {"msg": "Successfully logged out"}

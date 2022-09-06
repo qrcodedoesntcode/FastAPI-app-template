@@ -4,8 +4,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models.user import User
-from app.resources import strings
+from app.modules.users.models import User
+from app.services import strings
 
 IdType = Union["int", "str"]
 
@@ -53,4 +53,7 @@ async def delete_user_by_user_id(db, user_id: IdType):
     await db.delete(db_user)
     await db.commit()
 
-    return {"success": True}
+    return {
+        "status": True,
+        "msg": "Deleted",
+    }

@@ -8,14 +8,14 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.api.deps import get_db
+from app.auth.schema import TokenData
 from app.core.config import settings
 from app.core.logger import logger
-from app.crud.admin import get_user_by_username
-from app.resources import strings
-from app.resources.storage_method import storage
-from app.schemas.auth import TokenData
-from app.schemas.user import UserSchema
+from app.db.deps import get_db
+from app.modules.admin.crud import get_user_by_username
+from app.modules.users.schema import UserSchema
+from app.services import strings
+from app.services.storage import storage
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
