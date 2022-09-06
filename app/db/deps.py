@@ -2,7 +2,7 @@ from typing import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.database import async_session
+from app.db.session import async_session
 
 
 async def get_db() -> AsyncIterator[AsyncSession]:

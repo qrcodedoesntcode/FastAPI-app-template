@@ -29,3 +29,7 @@ class TimestampsMixin:
         onupdate=datetime.utcnow,
         nullable=False,
     )
+
+
+class BaseFeaturesMixin(PrimaryKeyMixin, TimestampsMixin):
+    __abstract__ = True
