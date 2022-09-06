@@ -4,7 +4,7 @@ from app.db.database import Base, BaseFeaturesMixin
 
 
 class User(Base, BaseFeaturesMixin):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
