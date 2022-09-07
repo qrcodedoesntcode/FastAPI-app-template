@@ -5,7 +5,7 @@ from app.db.mixins import BaseFeaturesMixin
 
 
 class User(Base, BaseFeaturesMixin):
-    __tablename__ = "user"
+    __tablename__ = "adm_user"
 
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
