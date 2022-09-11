@@ -3,6 +3,22 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, constr
 
 
+class UserProfileBase(BaseModel):
+    line1: str | None = None
+    line2: str | None = None
+    city: str | None = None
+    province: str | None = None
+    postcode: int | None = None
+
+
+class UserProfile(UserProfileBase):
+    id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+
 class UserBase(BaseModel):
     username: constr(to_lower=True, min_length=4, max_length=20, strip_whitespace=True)
     email: EmailStr
@@ -16,6 +32,7 @@ class UserCreate(UserBase):
 
 class UserInDBBase(UserBase):
     id: int
+    profile: UserProfile | None = None
     created_at: datetime = None
     updated_at: datetime = None
 

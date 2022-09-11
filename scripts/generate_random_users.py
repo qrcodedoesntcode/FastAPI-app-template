@@ -1,7 +1,8 @@
-from faker import Faker
+import asyncio
 import os.path
 import sys
-import asyncio
+
+from faker import Faker
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
