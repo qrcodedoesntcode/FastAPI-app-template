@@ -49,7 +49,7 @@ async def login_for_access_token(
 ) -> dict:
     user = await check_user_auth(db, form_data.username, form_data.password)
 
-    return generate_access_refresh_token(user)
+    return generate_access_refresh_token(user, form_data)
 
 
 @router.post(
@@ -63,7 +63,7 @@ async def refresh_token(
 ) -> dict:
     user = await validate_refresh_token(db, token=form_data.refresh_token)
 
-    tokens = generate_access_refresh_token(user)
+    tokens = generate_access_refresh_token(user, form_data)
 
     add_token_to_blacklist(form_data.refresh_token)
 

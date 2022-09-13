@@ -13,7 +13,11 @@ api_router = APIRouter()
 
 def _include_secured_router(router: APIRouter, tags: list[str | Enum]):
     return api_router.include_router(
-        router, tags=tags, dependencies=[Depends(get_current_active_user)]
+        router,
+        tags=tags,
+        dependencies=[
+            Depends(get_current_active_user)
+        ],  # Todo : Find a solution to factorize differently with scopes system
     )
 
 

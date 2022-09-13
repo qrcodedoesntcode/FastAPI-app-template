@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import bcrypt
 from fastapi import Depends, HTTPException, Query
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -11,13 +11,17 @@ from starlette import status
 from app.auth.schema import TokenData
 from app.core.config import settings
 from app.core.logger import logger
+from app.core.permissions import scopes
 from app.db.deps import get_db
 from app.modules.admin.crud import get_user_by_username
 from app.modules.users.schema import UserSchema
 from app.services import strings
 from app.services.storage import storage
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_STR}/auth/token",
+    scopes=scopes,
+)
 
 
 JWT_OPTIONS = {
@@ -69,7 +73,7 @@ async def check_user_auth(db: AsyncSession, username: str, password: str):
 
 
 def create_jwt_token(
-    data: dict, expires_delta: timedelta | None = None, scope: str = "access_token"
+    data: dict, expires_delta: timedelta | None = None, type: str = "access_token"
 ):
     """
     Create a JWT token (access_token/refresh_token) for a specific user (sub).
@@ -85,34 +89,36 @@ def create_jwt_token(
 
     jwt_key = (
         settings.JWT_ACCESS_TOKEN_KEY
-        if scope == "access_token"
+        if type == "access_token"
         else settings.JWT_REFRESH_TOKEN_KEY
     )
-    to_encode.update(
-        {"exp": expire, "iat": iat, "iss": iss, "jti": jti, "scope": scope}
-    )
+    to_encode.update({"exp": expire, "iat": iat, "iss": iss, "jti": jti, "type": type})
     encoded_jwt = jwt.encode(to_encode, jwt_key, algorithm=settings.ALGORITHM)
-    logger.debug(f"Creating {scope} for user {data['sub']}")
+    logger.debug(f"Creating {type} for user {data['sub']}")
     return encoded_jwt
 
 
 async def check_jwt(
+    security_scopes: SecurityScopes,
     db: AsyncSession = Depends(get_db),
     token: str = Depends(oauth2_scheme),
-    scope: str = Query(default="access_token", include_in_schema=False),
+    type: str = Query(default="access_token", include_in_schema=False),
 ):
     """
     Check if the JWT is valid or not.
     """
+    authenticate_value = "Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
-        headers={"WWW-Authenticate": "Bearer"},
+        headers={"WWW-Authenticate": authenticate_value},
     )
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     try:
         jwt_key = (
             settings.JWT_ACCESS_TOKEN_KEY
-            if scope == "access_token"
+            if type == "access_token"
             else settings.JWT_REFRESH_TOKEN_KEY
         )
         payload = jwt.decode(
@@ -123,18 +129,35 @@ async def check_jwt(
         )
         jti: str = payload.get("jti")
         username: str = payload.get("sub")
-        if jti in storage:
-            logger.debug(f"{jti} is in blacklist")
-            raise credentials_exception
         if username is None:
-            logger.debug("sub is None")
             raise credentials_exception
-        token_data = TokenData(username=username)
+
+        token_scopes = payload.get("scopes", [])
+        token_data = TokenData(username=username, scopes=token_scopes)
     except JWTError:
         raise credentials_exception
+
     user = await get_user_by_username(db, username=token_data.username)
+
     if user is None:
         raise credentials_exception
+
+    if jti in storage:
+        logger.debug(f"{jti} is in blacklist")
+        raise credentials_exception
+
+    if token_data.username is None:
+        logger.debug("sub is None")
+        raise credentials_exception
+
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=strings.NOT_ENOUGH_PERMISSIONS,
+                headers={"WWW-Authenticate": authenticate_value},
+            )
+
     return user
 
 
@@ -163,14 +186,14 @@ def validate_refresh_token(db: AsyncSession, token: str = Depends(oauth2_scheme)
     return check_jwt(db, token, "refresh_token")
 
 
-def add_token_to_blacklist(token: str, scope: str = "refresh_token") -> None:
+def add_token_to_blacklist(token: str, type: str = "refresh_token") -> None:
     """
     Add a token to the blacklist (refresh_token, access_token).
     If REDIS_CONNECTION is True, use a redis connection, else use a local dict.
     """
     jwt_key = (
         settings.JWT_ACCESS_TOKEN_KEY
-        if scope == "access_token"
+        if type == "access_token"
         else settings.JWT_REFRESH_TOKEN_KEY
     )
     payload = jwt.decode(
@@ -185,20 +208,21 @@ def add_token_to_blacklist(token: str, scope: str = "refresh_token") -> None:
     logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
 
 
-def generate_access_refresh_token(user) -> dict:
+def generate_access_refresh_token(user, form_data) -> dict:
     """
     Return an access token and a refresh token for a specific user.
     """
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_jwt_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "scopes": form_data.scopes},
+        expires_delta=access_token_expires,
     )
 
     refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
     refresh_token = create_jwt_token(
-        data={"sub": user.username},
+        data={"sub": user.username, "scopes": form_data.scopes},
         expires_delta=refresh_token_expires,
-        scope="refresh_token",
+        type="refresh_token",
     )
 
     return {
