@@ -1,3 +1,7 @@
+"""
+Overwrites default settings of fastapi_pagination
+"""
+
 from typing import Generic, TypeVar
 
 from fastapi import Query

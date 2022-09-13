@@ -4,12 +4,18 @@ import sqlalchemy as sa
 
 
 class PrimaryKeyMixin:
+    """
+    Add a primakry key to the model that inherits from this class.
+    """
 
     __abstract__ = True
     id = sa.Column(sa.Integer, primary_key=True)
 
 
 class TimestampsMixin:
+    """
+    Add the fields created_at/updated_at to the model that inherits from this class.
+    """
 
     __abstract__ = True
 

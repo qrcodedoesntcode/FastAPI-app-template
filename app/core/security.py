@@ -51,6 +51,9 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 async def check_user_auth(db: AsyncSession, username: str, password: str):
+    """
+    Check if user information (username, password) are valid
+    """
     user = await get_user_by_username(db, username)
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -68,6 +71,9 @@ async def check_user_auth(db: AsyncSession, username: str, password: str):
 def create_jwt_token(
     data: dict, expires_delta: timedelta | None = None, scope: str = "access_token"
 ):
+    """
+    Create a JWT token (access_token/refresh_token) for a specific user (sub).
+    """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -95,6 +101,9 @@ async def check_jwt(
     token: str = Depends(oauth2_scheme),
     scope: str = Query(default="access_token", include_in_schema=False),
 ):
+    """
+    Check if the JWT is valid or not.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
@@ -132,6 +141,9 @@ async def check_jwt(
 def get_current_active_user(
     current_user: UserSchema = Depends(check_jwt),
 ) -> UserSchema:
+    """
+    Check the current logged-in user.
+    """
     if current_user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -145,13 +157,16 @@ def get_current_active_user(
 
 
 def validate_refresh_token(db: AsyncSession, token: str = Depends(oauth2_scheme)):
+    """
+    Check if a refresh token is valid or not.
+    """
     return check_jwt(db, token, "refresh_token")
 
 
 def add_token_to_blacklist(token: str, scope: str = "refresh_token") -> None:
     """
-    Add token to the blacklist.
-    Added the possibility to blacklist a token by scope (refresh_token, access_token).
+    Add a token to the blacklist (refresh_token, access_token).
+    If REDIS_CONNECTION is True, use a redis connection, else use a local dict.
     """
     jwt_key = (
         settings.JWT_ACCESS_TOKEN_KEY
@@ -171,6 +186,9 @@ def add_token_to_blacklist(token: str, scope: str = "refresh_token") -> None:
 
 
 def generate_access_refresh_token(user) -> dict:
+    """
+    Return an access token and a refresh token for a specific user.
+    """
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_jwt_token(
         data={"sub": user.username}, expires_delta=access_token_expires

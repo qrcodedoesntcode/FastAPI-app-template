@@ -12,7 +12,9 @@ class AppEnvironment(str, Enum):
 
 
 class Config(BaseSettings):
-    """Base configuration."""
+    """
+    Base configuration.
+    """
 
     API_V1_STR = "/api/v1"
 
