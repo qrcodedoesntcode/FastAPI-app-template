@@ -4,6 +4,10 @@ updates:
     directory: "/requirements"
     schedule:
       interval: "daily"
+    commit-message:
+      prefix: "fix"
+      prefix-development: "build"
+      include: "scope"
     open-pull-requests-limit: 20
     rebase-strategy: auto
 
@@ -11,5 +15,9 @@ updates:
     directory: "/docker"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "fix"
+      prefix-development: "build"
+      include: "scope"
     open-pull-requests-limit: 20
     rebase-strategy: auto
