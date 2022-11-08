@@ -6,7 +6,7 @@ app = create_app()
 if __name__ == "__main__":
     import uvicorn
 
-    logger.info("Starting uvicorn in reload mode")
+    logger.info("Starting uvicorn")
     uvicorn.run(
         "main:app",
         host=settings.UVICORN_HOST,
