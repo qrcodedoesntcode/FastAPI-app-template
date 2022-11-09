@@ -1,10 +1,9 @@
-from sqlalchemy import Boolean, Column, ForeignKey, String, ForeignKeyConstraint, Integer
+from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
-from app.db.deps import reference_col, pivot_table
-from app.db.mixins import BaseFeaturesMixin, TimestampsMixin
-
+from app.db.deps import pivot_table, reference_col
+from app.db.mixins import BaseFeaturesMixin
 
 # Association/Pivot tables
 user_role = pivot_table(
@@ -56,11 +55,11 @@ class Profile(Base, BaseFeaturesMixin):
 class Role(Base, BaseFeaturesMixin):
     __tablename__ = "cre_role"
 
-    name = Column(String(50))
+    name = Column(String(50), unique=True)
     description = Column(String(255))
 
     # Relationship
-    users = relationship("User", secondary=user_role)
+    # users = relationship("User", secondary=user_role)
     permissions = relationship("Permission", secondary=role_permission)
 
 
@@ -69,6 +68,3 @@ class Permission(Base, BaseFeaturesMixin):
 
     scope = Column(String(50), unique=True, index=True)
     description = Column(String(255))
-
-    # Relationship
-    roles = relationship("Role", secondary=role_permission)

@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.params_paginate import Page
 from app.core.schema import DefaultResponse
 from app.core.security import get_current_active_user
-from app.db import deps
 from app.db.deps import get_db
 from app.modules.admin.crud import (
     delete_user_by_user_id,

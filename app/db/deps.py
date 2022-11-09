@@ -1,10 +1,10 @@
 from typing import AsyncIterator
 
-from sqlalchemy import Column, ForeignKey, Table, Integer
+from sqlalchemy import Column, ForeignKey, Integer, Table
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import async_session
 from app.db.base import Base
+from app.db.session import async_session
 
 
 async def get_db() -> AsyncIterator[AsyncSession]:

@@ -52,6 +52,7 @@ async def delete_user_by_user_id(db, user_id: IdType):
 
     await db.delete(db_user)
     await db.commit()
+    await db.flush()
 
     return {
         "status": True,

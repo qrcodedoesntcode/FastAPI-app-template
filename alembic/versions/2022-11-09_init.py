@@ -2,12 +2,12 @@
 
 Revision ID: 0
 Revises: 
-Create Date: 2022-11-09 12:01:32.478473
+Create Date: 2022-11-09 16:01:52.497011
 
 """
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '0'
@@ -33,7 +33,8 @@ def upgrade():
     sa.Column('updated_at', sa.TIMESTAMP(), server_default=sa.text('now()'), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=True),
     sa.Column('description', sa.String(length=255), nullable=True),
-    sa.PrimaryKeyConstraint('id', name=op.f('cre_role_pkey'))
+    sa.PrimaryKeyConstraint('id', name=op.f('cre_role_pkey')),
+    sa.UniqueConstraint('name', name=op.f('cre_role_name_key'))
     )
     op.create_table('cre_user',
     sa.Column('id', sa.Integer(), nullable=False),
