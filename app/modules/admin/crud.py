@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.modules.admin.models import User
+from app.modules.core.models import User
 from app.services import strings
 
 IdType = Union["int", "str"]

@@ -45,7 +45,7 @@ async def get_users(
 )
 async def get_specific_user(
     user_id: IdType,
-    db: AsyncSession = Depends(deps.get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: UserSchema = Security(  # noqa
         get_current_active_user, scopes=["admin"]
     ),
@@ -61,7 +61,7 @@ async def get_specific_user(
 )
 async def delete_specific_user(
     user_id: IdType,
-    db: AsyncSession = Depends(deps.get_db),
+    db: AsyncSession = Depends(get_db),
     current_user: UserSchema = Security(  # noqa
         get_current_active_user, scopes=["admin", "user:delete"]
     ),
