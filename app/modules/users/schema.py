@@ -8,7 +8,7 @@ class UserProfileBase(BaseModel):
     line2: str | None = None
     city: str | None = None
     province: str | None = None
-    postcode: int | None = None
+    postcode: str | None = None
 
 
 class UserProfile(UserProfileBase):

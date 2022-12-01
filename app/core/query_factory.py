@@ -93,3 +93,26 @@ async def create_entry(db: AsyncSession, model, data_in: dict):
     await db.commit()
     await db.flush()
     return data
+
+
+async def update_entry(db: AsyncSession, model, entry_id: int, schema):
+    """
+    Update an entry in the database
+    example:
+    update_entry(db, Role, role.id, RoleUpdate)
+    """
+    query = await get_specific_by_id(db, model, entry_id)
+
+    if isinstance(schema, dict):
+        updated_data = schema
+    else:
+        updated_data = schema.dict(exclude_unset=True)
+
+    for key, value in updated_data.items():
+        setattr(query, key, value)
+
+    db.add(query)
+    await db.commit()
+    await db.refresh(query)
+
+    return query
