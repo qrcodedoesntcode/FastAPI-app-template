@@ -40,6 +40,10 @@ class Config(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_SOCKET_TIMEOUT: int = 5
 
+    SENTRY_ENABLED: bool | None = False
+    SENTRY_DSN: str | None = ""
+    SENTRY_ENV: str | None = "dev"
+
     LOGGING_LEVEL: str = "INFO"
 
     ALGORITHM = "HS384"

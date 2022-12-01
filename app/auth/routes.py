@@ -2,16 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.crud import check_email_is_taken, check_username_is_taken, create_new_user
 from app.auth.schema import Message, RefreshToken, Token
 from app.core.config import settings
+from app.core.query_factory import check_if_exists, create_entry
 from app.core.security import (
     add_token_to_blacklist,
     check_user_auth,
     generate_access_refresh_token,
+    get_password_hash,
     validate_refresh_token,
 )
 from app.db.deps import get_db
+from app.modules.core.models import User
 from app.modules.users.schema import UserCreate, UserSchema
 from app.services import strings
 
@@ -32,10 +34,17 @@ async def create_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=strings.CLOSED_REGISTRATION,
         )
-    await check_username_is_taken(db, user.username)
-    await check_email_is_taken(db, user.email)
+    await check_if_exists(db, User, [User.username == user.username])
+    await check_if_exists(db, User, [User.email == user.email])
 
-    return await create_new_user(db=db, user=user)
+    data_in = {
+        "username": user.username,
+        "email": user.email,
+        "password": get_password_hash(user.password),
+        "is_active": user.is_active,
+    }
+
+    return await create_entry(db, User, data_in)
 
 
 @router.post(

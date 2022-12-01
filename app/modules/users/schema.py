@@ -32,12 +32,15 @@ class UserCreate(UserBase):
 
 class UserInDBBase(UserBase):
     id: int
-    profile: UserProfile | None = None
     created_at: datetime = None
     updated_at: datetime = None
 
     class Config:
         orm_mode = True
+
+
+class UserInDBProfile(UserInDBBase):
+    profile: UserProfile | None = None
 
 
 class UserUpdate(UserInDBBase):

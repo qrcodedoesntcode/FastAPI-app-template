@@ -12,7 +12,5 @@ router = APIRouter(prefix="/users")
     response_model=UserSchema,
     name="Get current user",
 )
-def profile(
-    current_user: UserSchema = Security(get_current_active_user, scopes=["user:read"])
-) -> UserSchema:
+def profile(current_user: UserSchema = Security(get_current_active_user)) -> UserSchema:
     return current_user
