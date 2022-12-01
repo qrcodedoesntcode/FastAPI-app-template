@@ -13,7 +13,7 @@ from app.core.security import (
     validate_refresh_token,
 )
 from app.db.deps import get_db
-from app.modules.core.models import User
+from app.modules.core.models import User, Profile
 from app.modules.users.schema import UserCreate, UserSchema
 from app.services import strings
 
@@ -44,7 +44,10 @@ async def create_user(
         "is_active": user.is_active,
     }
 
-    return await create_entry(db, User, data_in)
+    user = await create_entry(db, User, data_in)
+    await create_entry(db, Profile, {"user_id": user.id})
+
+    return user
 
 
 @router.post(
