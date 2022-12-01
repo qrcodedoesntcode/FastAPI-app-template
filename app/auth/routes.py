@@ -13,7 +13,7 @@ from app.core.security import (
     validate_refresh_token,
 )
 from app.db.deps import get_db
-from app.modules.core.models import User, Profile
+from app.modules.core.models import Profile, User
 from app.modules.users.schema import UserCreate, UserSchema
 from app.services import strings
 

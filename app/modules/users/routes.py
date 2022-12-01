@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Security, status, Depends
-
-from app.core.security import get_current_active_user
-from app.modules.users.schema import UserSchemaProfile, UserProfile, UserProfileBase
-from app.core.query_factory import update_entry
+from fastapi import APIRouter, Depends, Security, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.query_factory import update_entry
+from app.core.security import get_current_active_user
 from app.db.deps import get_db
 from app.modules.core.models import Profile
+from app.modules.users.schema import UserProfile, UserProfileBase, UserSchemaProfile
 
 router = APIRouter(prefix="/users")
 
@@ -26,7 +26,7 @@ def get_current_user(
     "/current/profile",
     status_code=status.HTTP_200_OK,
     response_model=UserProfile,
-    name="Get current user",
+    name="Update current user profile",
 )
 async def update_current_profile(
     profile: UserProfileBase,
