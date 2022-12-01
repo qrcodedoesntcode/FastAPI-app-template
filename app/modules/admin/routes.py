@@ -10,7 +10,7 @@ from app.core.schema import DefaultResponse
 from app.core.security import get_current_active_user
 from app.db.deps import get_db
 from app.modules.core.models import User
-from app.modules.users.schema import UserInDBProfile, UserSchema
+from app.modules.users.schema import UserSchema, UserSchemaProfile
 
 router = APIRouter(prefix="/admin")
 
@@ -32,14 +32,14 @@ async def get_users(
 
 @router.get(
     "/users/{user_id}",
-    response_model=UserInDBProfile,
+    response_model=UserSchemaProfile,
     status_code=status.HTTP_200_OK,
     name="Get specific user by user_id",
 )
 async def get_specific_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: UserInDBProfile = Security(  # noqa
+    current_user: UserSchemaProfile = Security(  # noqa
         get_current_active_user, scopes=["admin"]
     ),
 ):

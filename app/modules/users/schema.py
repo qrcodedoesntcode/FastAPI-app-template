@@ -13,7 +13,6 @@ class UserProfileBase(BaseModel):
 
 class UserProfile(UserProfileBase):
     id: int
-    user_id: int
 
     class Config:
         orm_mode = True
@@ -53,6 +52,10 @@ class UserUpdate(UserInDBBase):
 
 
 class UserSchema(UserInDBBase):
+    pass
+
+
+class UserSchemaProfile(UserInDBProfile):
     pass
 
 
