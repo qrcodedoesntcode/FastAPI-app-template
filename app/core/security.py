@@ -150,15 +150,16 @@ async def check_jwt(
         logger.debug("sub is None")
         raise credentials_exception
 
-    for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=strings.NOT_ENOUGH_PERMISSIONS,
-                headers={"WWW-Authenticate": authenticate_value},
-            )
+    for accepted_scope in security_scopes.scopes:
+        for user_scope in token_data.scopes:
+            if accepted_scope == user_scope:
+                return user
 
-    return user
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=strings.NOT_ENOUGH_PERMISSIONS,
+        headers={"WWW-Authenticate": authenticate_value},
+    )
 
 
 def get_current_active_user(
