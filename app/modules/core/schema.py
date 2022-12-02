@@ -19,3 +19,8 @@ class RoleCreate(RoleBase):
 class UserRoleBase(OrmTrue):
     username: str | None = None
     roles: list[RoleBase] | None = None
+
+
+class PermissionBase(OrmTrue):
+    scope: str | None = None
+    description: str | None = None
