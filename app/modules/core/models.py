@@ -35,7 +35,7 @@ class User(Base, BaseFeaturesMixin):
         uselist=False,
         lazy=False,
     )
-    roles = relationship("Role", secondary=user_role)
+    roles = relationship("Role", secondary=user_role, back_populates="users")
 
 
 class Profile(Base, BaseFeaturesMixin):
@@ -59,8 +59,10 @@ class Role(Base, BaseFeaturesMixin):
     description = Column(String(255))
 
     # Relationship
-    # users = relationship("User", secondary=user_role)
-    permissions = relationship("Permission", secondary=role_permission)
+    users = relationship("User", secondary=user_role, back_populates="roles")
+    permissions = relationship(
+        "Permission", secondary=role_permission, back_populates="roles"
+    )
 
 
 class Permission(Base, BaseFeaturesMixin):
@@ -68,3 +70,8 @@ class Permission(Base, BaseFeaturesMixin):
 
     scope = Column(String(50), unique=True, index=True)
     description = Column(String(255))
+
+    # Relationship
+    roles = relationship(
+        "Role", secondary=role_permission, back_populates="permissions"
+    )

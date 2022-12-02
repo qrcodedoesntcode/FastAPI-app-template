@@ -9,7 +9,7 @@ from app.core.query_factory import check_if_exists, create_entry, get_all_pagina
 from app.core.security import get_current_active_user
 from app.db.deps import get_db
 from app.modules.core.crud import get_user_roles
-from app.modules.core.models import Role
+from app.modules.core.models import Role, User
 from app.modules.core.schema import RoleBase, RoleCreate, UserRoleBase
 from app.modules.users.schema import UserSchema
 
@@ -45,8 +45,7 @@ async def create_role(
     ),
 ) -> RoleBase:
     await check_if_exists(db, Role, [Role.name == role.name])
-    data_in = {"name": role.name, "description": role.description}
-    return await create_entry(db, Role, data_in)
+    return await create_entry(db, Role, role)
 
 
 @router.get(
@@ -67,11 +66,24 @@ async def get_specific_user_roles(
 
 @router.post(
     "/roles/{user_id}",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserRoleBase,
     name="Link a specific role to an user",
 )
-async def link_role_user():
-    pass
+async def link_role_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserSchema = Security(
+        get_current_active_user, scopes=["admin", "role:create"]
+    ),
+):
+    user_id = User(id=user_id)
+    data = Role.users.append(user_id)
+    db.add(data)
+
+    await db.commit()
+    await db.flush()
+    return data
 
 
 @router.get(

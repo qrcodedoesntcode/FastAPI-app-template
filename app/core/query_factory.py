@@ -80,14 +80,22 @@ async def check_if_exists(db: AsyncSession, model, filter_lst: list):
     return False
 
 
-async def create_entry(db: AsyncSession, model, data_in: dict):
+async def create_entry(db: AsyncSession, model, schema):
     """
     Create a new entry in the database
     example:
     data_in = {"name": "test", "description": "test"}
     create_entry(db, Role, data_in)
+    or with schema:
+    create_entry(db, Role, role)
+    Where role is a RoleCreate object
     """
-    data = model(**data_in)
+    if isinstance(schema, dict):
+        updated_data = schema
+    else:
+        updated_data = schema.dict(exclude_unset=True)
+
+    data = model(**updated_data)
     db.add(data)
 
     await db.commit()

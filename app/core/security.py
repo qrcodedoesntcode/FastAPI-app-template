@@ -115,6 +115,7 @@ async def check_jwt(
     )
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+
     try:
         jwt_key = (
             settings.JWT_ACCESS_TOKEN_KEY
@@ -127,8 +128,10 @@ async def check_jwt(
             algorithms=[settings.ALGORITHM],
             options=JWT_OPTIONS,
         )
+
         jti: str = payload.get("jti")
         username: str = payload.get("sub")
+
         if username is None:
             raise credentials_exception
 
@@ -150,16 +153,16 @@ async def check_jwt(
         logger.debug("sub is None")
         raise credentials_exception
 
-    for accepted_scope in security_scopes.scopes:
-        for user_scope in token_data.scopes:
-            if accepted_scope == user_scope:
-                return user
+    check_scope = any(scope in token_data.scopes for scope in security_scopes.scopes)
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=strings.NOT_ENOUGH_PERMISSIONS,
-        headers={"WWW-Authenticate": authenticate_value},
-    )
+    if not check_scope:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=strings.NOT_ENOUGH_PERMISSIONS,
+            headers={"WWW-Authenticate": authenticate_value},
+        )
+
+    return user
 
 
 def get_current_active_user(
