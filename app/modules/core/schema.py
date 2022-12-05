@@ -24,3 +24,7 @@ class UserRoleBase(OrmTrue):
 class PermissionBase(OrmTrue):
     scope: str | None = None
     description: str | None = None
+
+
+class UserPermissionBase(OrmTrue):
+    permissions: PermissionBase | None = None

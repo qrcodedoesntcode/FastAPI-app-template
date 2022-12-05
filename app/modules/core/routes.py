@@ -8,10 +8,15 @@ from app.core.params_paginate import Page
 from app.core.query_factory import check_if_exists, create_entry, get_all_paginate
 from app.core.security import get_current_active_user
 from app.db.deps import get_db
-from app.modules.core.crud import get_user_roles
-from app.modules.core.models import Role, Permission
-from app.modules.core.schema import RoleBase, RoleCreate, UserRoleBase, PermissionBase
-from app.modules.users.schema import UserSchema
+from app.modules.core.crud import get_user_permission, get_user_roles
+from app.modules.core.models import Permission, Role, User
+from app.modules.core.schema import (
+    PermissionBase,
+    RoleBase,
+    RoleCreate,
+    UserPermissionBase,
+    UserRoleBase,
+)
 
 router = APIRouter(prefix="/core")
 
@@ -24,7 +29,7 @@ router = APIRouter(prefix="/core")
 )
 async def get_roles(
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "role:read"]
     ),
 ) -> AbstractPage:
@@ -40,7 +45,7 @@ async def get_roles(
 async def create_role(
     role: RoleCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "role:create"]
     ),
 ) -> RoleBase:
@@ -49,7 +54,7 @@ async def create_role(
 
 
 @router.get(
-    "/roles/{user_id}",
+    "/roles/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserRoleBase,
     name="Get specific user roles",
@@ -57,7 +62,7 @@ async def create_role(
 async def get_specific_user_roles(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "role:read"]
     ),
 ):
@@ -65,7 +70,7 @@ async def get_specific_user_roles(
 
 
 @router.post(
-    "/roles/{user_id}",
+    "/roles/user/{user_id}",
     status_code=status.HTTP_201_CREATED,
     response_model=UserRoleBase,
     name="Link a specific role to an user",
@@ -82,7 +87,7 @@ async def link_role_user():
 )
 async def get_permissions(
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:read"]
     ),
 ) -> AbstractPage:
@@ -98,7 +103,7 @@ async def get_permissions(
 async def create_permission(
     permission: PermissionBase,
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:create"]
     ),
 ) -> PermissionBase:
@@ -107,12 +112,19 @@ async def create_permission(
 
 
 @router.get(
-    "/permissions/{user_id}",
+    "/permissions/user/{user_id}",
     status_code=status.HTTP_200_OK,
+    response_model=UserPermissionBase,
     name="Get specific user permissions",
 )
-async def get_user_permissions() -> AbstractPage:
-    pass
+async def get_specific_user_permission(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:read"]
+    ),
+):
+    return await get_user_permission(db, user_id)
 
 
 add_pagination(router)

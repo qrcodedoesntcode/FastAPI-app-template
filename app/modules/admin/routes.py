@@ -33,9 +33,7 @@ router = APIRouter(prefix="/admin")
 )
 async def get_users(
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
-        get_current_active_user, scopes=["admin"]
-    ),
+    current_user: User = Security(get_current_active_user, scopes=["admin"]),  # noqa
 ) -> AbstractPage:
     return await paginate(db, get_all_paginate(User))
 
@@ -65,7 +63,7 @@ async def get_specific_user(
 async def delete_specific_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: UserSchema = Security(  # noqa
+    current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "user:delete"]
     ),
 ):

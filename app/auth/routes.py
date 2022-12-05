@@ -60,8 +60,7 @@ async def login_for_access_token(
     db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> dict:
     user = await check_user_auth(db, form_data.username, form_data.password)
-
-    return generate_access_refresh_token(user, form_data)
+    return await generate_access_refresh_token(db, user)
 
 
 @router.post(
@@ -71,13 +70,13 @@ async def login_for_access_token(
     name="Refresh an access token",
 )
 async def refresh_token(
-    db: AsyncSession = Depends(get_db), form_data: RefreshToken = Depends()
+    db: AsyncSession = Depends(get_db), token: RefreshToken = Depends()
 ) -> dict:
-    user = await validate_refresh_token(db, token=form_data.refresh_token)
+    user = await validate_refresh_token(db, token=token.refresh_token)
 
-    tokens = generate_access_refresh_token(user, form_data)
+    tokens = await generate_access_refresh_token(db, user)
 
-    add_token_to_blacklist(form_data.refresh_token)
+    add_token_to_blacklist(token.refresh_token)
 
     return tokens
 

@@ -6,21 +6,20 @@ from fastapi import Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from starlette import status
 
 from app.auth.schema import TokenData
 from app.core.config import settings
 from app.core.logger import logger
-from app.core.permissions import scopes
 from app.db.deps import get_db
 from app.modules.admin.crud import get_user_by_username
-from app.modules.users.schema import UserSchema
+from app.modules.core.models import User
 from app.services import strings
 from app.services.storage import storage
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/token",
-    scopes=scopes,
 )
 
 
@@ -51,7 +50,23 @@ def get_password_hash(password: str) -> str:
 
 
 def verify_password(password: str, password_hash: str) -> bool:
+    # This function take approximately 0.29 seconds to run because of the bcrypt
     return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+
+
+async def _get_user_scopes(db: AsyncSession, user: User) -> list:
+    """
+    Get user scopes from the database.
+    """
+    query = select(User).filter(User.id == user.id)
+    user = await db.execute(query)
+    result = user.scalars().first()
+
+    user_scopes = [
+        permission.scope for role in result.roles for permission in role.permissions
+    ]
+    logger.debug(f"User {result.username} has the following scopes: {user_scopes}")
+    return user_scopes
 
 
 async def check_user_auth(db: AsyncSession, username: str, password: str):
@@ -99,7 +114,7 @@ def create_jwt_token(
 
 
 async def check_jwt(
-    security_scopes: SecurityScopes,
+    security_scopes: SecurityScopes = SecurityScopes(),
     db: AsyncSession = Depends(get_db),
     token: str = Depends(oauth2_scheme),
     type: str = Query(default="access_token", include_in_schema=False),
@@ -153,7 +168,13 @@ async def check_jwt(
         logger.debug("sub is None")
         raise credentials_exception
 
-    check_scope = any(scope in token_data.scopes for scope in security_scopes.scopes)
+    if security_scopes.scopes:
+        check_scope = any(
+            scope in token_data.scopes for scope in security_scopes.scopes
+        )
+    else:
+        # If no security scopes are defined, return True
+        check_scope = True
 
     if not check_scope:
         raise HTTPException(
@@ -166,8 +187,8 @@ async def check_jwt(
 
 
 def get_current_active_user(
-    current_user: UserSchema = Depends(check_jwt),
-) -> UserSchema:
+    current_user: User = Depends(check_jwt),
+) -> User:
     """
     Check the current logged-in user.
     """
@@ -187,7 +208,7 @@ def validate_refresh_token(db: AsyncSession, token: str = Depends(oauth2_scheme)
     """
     Check if a refresh token is valid or not.
     """
-    return check_jwt(db, token, "refresh_token")
+    return check_jwt(db=db, token=token, type="refresh_token")
 
 
 def add_token_to_blacklist(token: str, type: str = "refresh_token") -> None:
@@ -212,19 +233,21 @@ def add_token_to_blacklist(token: str, type: str = "refresh_token") -> None:
     logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
 
 
-def generate_access_refresh_token(user, form_data) -> dict:
+async def generate_access_refresh_token(db: AsyncSession, user) -> dict:
     """
     Return an access token and a refresh token for a specific user.
     """
+    user_scopes = await _get_user_scopes(db, user)
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_jwt_token(
-        data={"sub": user.username, "scopes": form_data.scopes},
+        data={"sub": user.username, "scopes": user_scopes},
         expires_delta=access_token_expires,
     )
 
     refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
     refresh_token = create_jwt_token(
-        data={"sub": user.username, "scopes": form_data.scopes},
+        data={"sub": user.username},
         expires_delta=refresh_token_expires,
         type="refresh_token",
     )

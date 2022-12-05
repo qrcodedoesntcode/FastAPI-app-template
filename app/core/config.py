@@ -45,6 +45,7 @@ class Config(BaseSettings):
     SENTRY_ENV: str | None = "dev"
 
     LOGGING_LEVEL: str = "INFO"
+    SQL_VERBOSE_LOGGING: bool = False
 
     ALGORITHM = "HS384"
     ACCESS_TOKEN_EXPIRE_MINUTES = 15
