@@ -65,7 +65,9 @@ async def _get_user_scopes(db: AsyncSession, user: User) -> list:
     user_scopes = [
         permission.scope for role in result.roles for permission in role.permissions
     ]
+
     logger.debug(f"User {result.username} has the following scopes: {user_scopes}")
+
     return user_scopes
 
 
@@ -74,16 +76,20 @@ async def check_user_auth(db: AsyncSession, username: str, password: str):
     Check if user information (username, password) are valid
     """
     user = await get_user_by_username(db, username)
+
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=strings.INCORRECT_USER_PASSWORD,
         headers={"WWW-Authenticate": "Bearer"},
     )
+
     if not user:
         raise credentials_error
     if not verify_password(password, user.password):
         raise credentials_error
+
     logger.info(f"Authenticating user {username}")
+
     return user
 
 
@@ -94,10 +100,12 @@ def create_jwt_token(
     Create a JWT token (access_token/refresh_token) for a specific user (sub).
     """
     to_encode = data.copy()
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
+
     iat = datetime.utcnow()
     iss = settings.PROJECT_NAME
     jti = str(uuid.uuid4())
@@ -107,9 +115,12 @@ def create_jwt_token(
         if type == "access_token"
         else settings.JWT_REFRESH_TOKEN_KEY
     )
+
     to_encode.update({"exp": expire, "iat": iat, "iss": iss, "jti": jti, "type": type})
     encoded_jwt = jwt.encode(to_encode, jwt_key, algorithm=settings.ALGORITHM)
+
     logger.debug(f"Creating {type} for user {data['sub']}")
+
     return encoded_jwt
 
 
@@ -128,6 +139,7 @@ async def check_jwt(
         detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
         headers={"WWW-Authenticate": authenticate_value},
     )
+
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
 
@@ -197,10 +209,12 @@ def get_current_active_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=strings.COULD_NOT_VALIDATE_CREDENTIALS,
         )
+
     if not current_user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=strings.INACTIVE_USER
         )
+
     return current_user
 
 

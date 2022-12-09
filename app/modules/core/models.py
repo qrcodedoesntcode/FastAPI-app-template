@@ -22,9 +22,9 @@ role_permission = pivot_table(
 class User(Base, BaseFeaturesMixin):
     __tablename__ = "cre_user"
 
-    username = Column(String, unique=True, index=True, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
+    username = Column(String(30), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    password = Column(String(100), nullable=False)
     is_active = Column(Boolean, default=False)
 
     # Relationship
@@ -38,9 +38,6 @@ class User(Base, BaseFeaturesMixin):
     roles = relationship(
         "Role", secondary=user_role, back_populates="users", lazy=False
     )
-
-    def get_user_permission(self):
-        return [permission for role in self.roles for permission in role.permissions]
 
 
 class Profile(Base, BaseFeaturesMixin):
@@ -80,5 +77,5 @@ class Permission(Base, BaseFeaturesMixin):
 
     # Relationship
     roles = relationship(
-        "Role", secondary=role_permission, back_populates="permissions"
+        "Role", secondary=role_permission, back_populates="permissions", lazy=False
     )

@@ -19,13 +19,13 @@ class UserProfile(UserProfileBase):
 
 
 class UserBase(BaseModel):
-    username: constr(to_lower=True, min_length=4, max_length=20, strip_whitespace=True)
+    username: constr(to_lower=True, min_length=4, max_length=30, strip_whitespace=True)
     email: EmailStr
     is_active: bool | None = None
 
 
 class UserCreate(UserBase):
-    password: constr(min_length=8)
+    password: constr(min_length=8, max_length=255)
     email: EmailStr
 
 
@@ -44,10 +44,10 @@ class UserInDBProfile(UserInDBBase):
 
 class UserUpdate(UserInDBBase):
     username: constr(
-        to_lower=True, min_length=4, max_length=20, strip_whitespace=True
+        to_lower=True, min_length=4, max_length=30, strip_whitespace=True
     ) | None = None
     email: EmailStr | None = None
-    password: constr(min_length=8) | None = None
+    password: constr(min_length=8, max_length=60) | None = None
     is_active: bool | None = None
 
 

@@ -124,7 +124,9 @@ async def get_specific_user_permission(
         get_current_active_user, scopes=["admin", "permission:read"]
     ),
 ):
-    return await get_user_permission(db, user_id)
+    user_permission = await get_user_permission(db, user_id)
+
+    return user_permission
 
 
 add_pagination(router)
