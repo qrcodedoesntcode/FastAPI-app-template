@@ -11,6 +11,7 @@ from app.core.query_factory import (
     delete_by_id,
     get_all_paginate,
     get_specific_by_id,
+    update_entry,
 )
 from app.core.schema import DefaultResponse
 from app.core.security import get_current_active_user
@@ -59,6 +60,25 @@ async def create_role(
 ) -> RoleBase:
     await check_if_exists(db, Role, [Role.name == role.name])
     return await create_entry(db, Role, role)
+
+
+@router.put(
+    "/roles/{role_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=RoleBase,
+    name="Update specific role",
+)
+async def update_role(
+    role_id: int,
+    role: RoleBase,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:update"]
+    ),
+) -> RoleBase:
+    await check_if_exists(db, Role, [Role.id == role_id])
+
+    return await update_entry(db, Role, role_id, role)
 
 
 @router.delete(
@@ -261,6 +281,25 @@ async def create_permission(
 ) -> PermissionBase:
     await check_if_exists(db, Permission, [Permission.scope == permission.scope])
     return await create_entry(db, Permission, permission)
+
+
+@router.put(
+    "/permissions/{permission_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionBase,
+    name="Update specific permission",
+)
+async def edit_permission(
+    permission_id: int,
+    permission: PermissionBase,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:update"]
+    ),
+) -> PermissionBase:
+    await check_if_exists(db, Permission, [Permission.scope == permission.scope])
+
+    return await update_entry(db, Permission, permission_id, permission)
 
 
 @router.delete(
