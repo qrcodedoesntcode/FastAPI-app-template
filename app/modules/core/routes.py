@@ -1,11 +1,18 @@
-from fastapi import APIRouter, Depends, Security, status
+from fastapi import APIRouter, Depends, Security, status, HTTPException
 from fastapi_pagination import add_pagination
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.ext.async_sqlalchemy import paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.params_paginate import Page
-from app.core.query_factory import check_if_exists, create_entry, get_all_paginate
+from app.core.query_factory import (
+    check_if_exists,
+    create_entry,
+    get_all_paginate,
+    get_specific_by_id,
+    delete_by_id,
+)
+from app.core.schema import DefaultResponse
 from app.core.security import get_current_active_user
 from app.db.deps import get_db
 from app.modules.core.crud import get_user_permission, get_user_roles
@@ -16,6 +23,7 @@ from app.modules.core.schema import (
     RoleCreate,
     UserPermissionBase,
     UserRoleBase,
+    RolePermissions,
 )
 
 router = APIRouter(prefix="/core")
@@ -53,6 +61,22 @@ async def create_role(
     return await create_entry(db, Role, role)
 
 
+@router.delete(
+    "/roles/{role_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultResponse,
+    name="Delete specific role",
+)
+async def delete_role(
+    role_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:delete"]
+    ),
+) -> DefaultResponse:
+    return await delete_by_id(db, Role, role_id)
+
+
 @router.get(
     "/roles/user/{user_id}",
     status_code=status.HTTP_200_OK,
@@ -70,13 +94,139 @@ async def get_specific_user_roles(
 
 
 @router.post(
-    "/roles/user/{user_id}",
+    "/roles/{role_id}/user/{user_id}",
     status_code=status.HTTP_201_CREATED,
     response_model=UserRoleBase,
-    name="Link a specific role to an user",
+    name="Link role to a user",
 )
-async def link_role_user():
-    pass
+async def link_role_to_user(
+    role_id: int,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:link"]
+    ),
+) -> UserRoleBase:
+    user = await get_specific_by_id(db, User, user_id)
+    role = await get_specific_by_id(db, Role, role_id)
+
+    user.roles.append(role)
+    await db.commit()
+
+    return await get_user_roles(db, user_id)
+
+
+@router.get(
+    "/roles/{role_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=RolePermissions,
+    name="Get permissions from a specific role",
+)
+async def role_permission(
+    role_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:read"]
+    ),
+) -> RolePermissions:
+    role = await get_specific_by_id(db, Role, role_id)
+
+    return RolePermissions(
+        id=role.id,
+        description=role.description,
+        name=role.name,
+        permissions=[permission for permission in role.permissions],
+    )
+
+
+@router.delete(
+    "/roles/{role_id}/user/{user_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultResponse,
+    name="Unlink a role from a user",
+)
+async def unlink_role_from_user(
+    role_id: int,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:link"]
+    ),
+) -> DefaultResponse:
+    user = await get_specific_by_id(db, User, user_id)
+    role = await get_specific_by_id(db, Role, role_id)
+
+    # Check if user has the role
+    if role not in user.roles:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User doesn't have this role",
+        )
+
+    user.roles.remove(role)
+    await db.commit()
+
+    return DefaultResponse(status=True, msg="Role unlinked from user")
+
+
+@router.post(
+    "/roles/{role_id}/permission/{permission_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultResponse,
+    name="Link role to a permission",
+)
+async def link_role_to_permission(
+    role_id: int,
+    permission_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:link"]
+    ),
+) -> DefaultResponse:
+    role = await get_specific_by_id(db, Role, role_id)
+    permission = await get_specific_by_id(db, Permission, permission_id)
+
+    # Check if role has the permission
+    if permission in role.permissions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role already has this permission",
+        )
+
+    role.permissions.append(permission)
+    await db.commit()
+
+    return DefaultResponse(status=True, msg="Permission linked to role")
+
+
+@router.delete(
+    "/roles/{role_id}/permission/{permission_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultResponse,
+    name="Unlink a role from a permission",
+)
+async def unlink_role_from_permission(
+    role_id: int,
+    permission_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:link"]
+    ),
+) -> DefaultResponse:
+    role = await get_specific_by_id(db, Role, role_id)
+    permission = await get_specific_by_id(db, Permission, permission_id)
+
+    # Check if role has the permission
+    if permission not in role.permissions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role doesn't have this permission",
+        )
+
+    role.permissions.remove(permission)
+    await db.commit()
+
+    return DefaultResponse(status=True, msg="Permission unlinked to role")
 
 
 @router.get(
@@ -109,6 +259,22 @@ async def create_permission(
 ) -> PermissionBase:
     await check_if_exists(db, Permission, [Permission.scope == permission.scope])
     return await create_entry(db, Permission, permission)
+
+
+@router.delete(
+    "/permissions/{permission_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=DefaultResponse,
+    name="Delete specific permission",
+)
+async def delete_permission(
+    permission_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:delete"]
+    ),
+) -> DefaultResponse:
+    return await delete_by_id(db, Permission, permission_id)
 
 
 @router.get(

@@ -38,6 +38,8 @@ async def get_user_permission(db: AsyncSession, user_id: int) -> UserPermissionB
             status_code=status.HTTP_404_NOT_FOUND, detail=strings.USER_NOT_FOUND
         )
 
-    user_permission = [permission for role in result.roles for permission in role.permissions]
+    user_permission = [
+        permission for role in result.roles for permission in role.permissions
+    ]
 
     return UserPermissionBase(username=result.username, permissions=user_permission)

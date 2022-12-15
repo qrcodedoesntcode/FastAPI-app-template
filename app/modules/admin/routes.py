@@ -64,7 +64,7 @@ async def delete_specific_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
-        get_current_active_user, scopes=["admin", "user:delete"]
+        get_current_active_user, scopes=["admin"]
     ),
 ):
     return await delete_by_id(db, User, user_id)

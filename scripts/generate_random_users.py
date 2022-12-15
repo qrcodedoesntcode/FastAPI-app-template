@@ -7,7 +7,7 @@ from faker import Faker
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from app.db.session import async_session
-from app.modules.core.models import User
+from app.modules.core.models import User, Role, Permission
 
 fake = Faker()
 
@@ -22,9 +22,30 @@ async def generate():
                     password=fake.password(),
                     is_active=True,
                 )
-                for _ in range(1000)
+                for _ in range(10_000)
             ]
         )
+
+        session.add_all(
+            [
+                Role(
+                    name=fake.unique.text(max_nb_chars=50),
+                    description=fake.text(max_nb_chars=255),
+                )
+                for _ in range(500)
+            ]
+        )
+
+        session.add_all(
+            [
+                Permission(
+                    scope=fake.unique.text(max_nb_chars=50),
+                    description=fake.text(max_nb_chars=255),
+                )
+                for _ in range(500)
+            ]
+        )
+
         await session.commit()
 
 

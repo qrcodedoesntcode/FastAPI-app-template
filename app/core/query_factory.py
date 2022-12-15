@@ -58,7 +58,7 @@ async def delete_by_id(db, model, id: int):
 
     return {
         "status": True,
-        "msg": "Deleted",
+        "msg": f"{model.__name__} ({id}) Deleted",
     }
 
 

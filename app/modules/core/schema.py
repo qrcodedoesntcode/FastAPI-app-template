@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from fastapi import Query
+from pydantic import BaseModel
 
 
 class OrmTrue(BaseModel):
@@ -23,10 +23,23 @@ class UserRoleBase(OrmTrue):
 
 
 class PermissionBase(OrmTrue):
-    scope: str | None = Query(None, min_length=1, max_length=255, property={"description": "The scope of the permission", "placeholder": "admin", "example": "admin"})
+    scope: str | None = Query(
+        None,
+        min_length=1,
+        max_length=255,
+        property={
+            "description": "The scope of the permission",
+            "placeholder": "admin",
+            "example": "admin",
+        },
+    )
     description: str | None = None
 
 
 class UserPermissionBase(OrmTrue):
     username: str | None = None
+    permissions: list[PermissionBase] | None = None
+
+
+class RolePermissions(RoleBase):
     permissions: list[PermissionBase] | None = None
