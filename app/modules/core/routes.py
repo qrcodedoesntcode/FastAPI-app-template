@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Security, status, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi_pagination import add_pagination
 from fastapi_pagination.bases import AbstractPage
 from fastapi_pagination.ext.async_sqlalchemy import paginate
@@ -8,9 +8,9 @@ from app.core.params_paginate import Page
 from app.core.query_factory import (
     check_if_exists,
     create_entry,
+    delete_by_id,
     get_all_paginate,
     get_specific_by_id,
-    delete_by_id,
 )
 from app.core.schema import DefaultResponse
 from app.core.security import get_current_active_user
@@ -21,9 +21,9 @@ from app.modules.core.schema import (
     PermissionBase,
     RoleBase,
     RoleCreate,
+    RolePermissions,
     UserPermissionBase,
     UserRoleBase,
-    RolePermissions,
 )
 
 router = APIRouter(prefix="/core")

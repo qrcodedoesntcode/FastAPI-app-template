@@ -7,7 +7,7 @@ from faker import Faker
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from app.db.session import async_session
-from app.modules.core.models import User, Role, Permission
+from app.modules.core.models import Permission, Role, User
 
 fake = Faker()
 
