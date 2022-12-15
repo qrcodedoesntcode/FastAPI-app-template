@@ -4,12 +4,14 @@ INSERT INTO cre_permission (id, scope, description) VALUES
         (1, 'admin', 'Admin permissions: can do everything'),
         (2, 'role:read', 'Role permissions: can read all roles and specific user roles'),
         (3, 'role:create', 'Role permissions: can create roles'),
-        (4, 'role:delete', 'Role permissions: can delete roles'),
-        (5, 'role:link', 'Role permissions: can link/unlink roles to users'),
-        (6, 'permission:read', 'Permission permissions: can read all permissions and specific user permissions'),
-        (7, 'permission:create', 'Permission permissions: can create permissions'),
-        (8, 'permission:delete', 'Permission permissions: can delete permissions'),
-        (9, 'permission:link', 'Permission permissions: can link/unlink permissions to roles');
+        (3, 'role:update', 'Role permissions: can update roles'),
+        (5, 'role:delete', 'Role permissions: can delete roles'),
+        (6, 'role:link', 'Role permissions: can link/unlink roles to users'),
+        (7, 'permission:read', 'Permission permissions: can read all permissions and specific user permissions'),
+        (8, 'permission:create', 'Permission permissions: can create permissions'),
+        (8, 'permission:update', 'Permission permissions: can update permissions'),
+        (9, 'permission:delete', 'Permission permissions: can delete permissions'),
+        (10, 'permission:link', 'Permission permissions: can link/unlink permissions to roles');
 
 
 -- Password: password
@@ -37,10 +39,11 @@ INSERT INTO cre_role_permission (cre_role_id, cre_permission_id) VALUES
         (2, 3),
         (2, 4),
         (2, 5),
-        (3, 6),
+        (2, 6),
         (3, 7),
         (3, 8),
-        (3, 9);
+        (3, 9),
+        (3, 10);
 
 
 INSERT INTO cre_user_role (cre_user_id, cre_role_id) VALUES
