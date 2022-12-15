@@ -111,7 +111,9 @@ async def link_role_to_user(
     role = await get_specific_by_id(db, Role, role_id)
 
     user.roles.append(role)
+
     await db.commit()
+    await db.refresh(user)
 
     return await get_user_roles(db, user_id)
 
@@ -172,7 +174,7 @@ async def unlink_role_from_user(
 @router.post(
     "/roles/{role_id}/permission/{permission_id}",
     status_code=status.HTTP_200_OK,
-    response_model=DefaultResponse,
+    response_model=RolePermissions,
     name="Link role to a permission",
 )
 async def link_role_to_permission(
@@ -182,21 +184,21 @@ async def link_role_to_permission(
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:link"]
     ),
-) -> DefaultResponse:
+) -> RolePermissions:
     role = await get_specific_by_id(db, Role, role_id)
     permission = await get_specific_by_id(db, Permission, permission_id)
 
-    # Check if role has the permission
-    if permission in role.permissions:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role already has this permission",
-        )
-
     role.permissions.append(permission)
-    await db.commit()
 
-    return DefaultResponse(status=True, msg="Permission linked to role")
+    await db.commit()
+    await db.refresh(role)
+
+    return RolePermissions(
+        id=role.id,
+        description=role.description,
+        name=role.name,
+        permissions=[permission for permission in role.permissions],
+    )
 
 
 @router.delete(
