@@ -18,6 +18,7 @@ class TimestampsMixin:
     """
 
     __abstract__ = True
+    __mapper_args__ = {"eager_defaults": True}
 
     created_at = sa.Column(
         "created_at",

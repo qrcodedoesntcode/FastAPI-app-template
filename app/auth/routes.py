@@ -2,16 +2,18 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.crud import check_email_is_taken, check_username_is_taken, create_new_user
 from app.auth.schema import Message, RefreshToken, Token
 from app.core.config import settings
+from app.core.query_factory import check_if_exists, create_entry
 from app.core.security import (
     add_token_to_blacklist,
     check_user_auth,
     generate_access_refresh_token,
+    get_password_hash,
     validate_refresh_token,
 )
 from app.db.deps import get_db
+from app.modules.core.models import Profile, User
 from app.modules.users.schema import UserCreate, UserSchema
 from app.services import strings
 
@@ -32,10 +34,20 @@ async def create_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=strings.CLOSED_REGISTRATION,
         )
-    await check_username_is_taken(db, user.username)
-    await check_email_is_taken(db, user.email)
+    await check_if_exists(db, User, [User.username == user.username])
+    await check_if_exists(db, User, [User.email == user.email])
 
-    return await create_new_user(db=db, user=user)
+    data_in = {
+        "username": user.username,
+        "email": user.email,
+        "password": get_password_hash(user.password),
+        "is_active": user.is_active,
+    }
+
+    user = await create_entry(db, User, data_in)
+    await create_entry(db, Profile, {"user_id": user.id})
+
+    return user
 
 
 @router.post(
@@ -48,8 +60,7 @@ async def login_for_access_token(
     db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> dict:
     user = await check_user_auth(db, form_data.username, form_data.password)
-
-    return generate_access_refresh_token(user)
+    return await generate_access_refresh_token(db, user)
 
 
 @router.post(
@@ -59,13 +70,13 @@ async def login_for_access_token(
     name="Refresh an access token",
 )
 async def refresh_token(
-    db: AsyncSession = Depends(get_db), form_data: RefreshToken = Depends()
+    db: AsyncSession = Depends(get_db), token: RefreshToken = Depends()
 ) -> dict:
-    user = await validate_refresh_token(db, token=form_data.refresh_token)
+    user = await validate_refresh_token(db, token=token.refresh_token)
 
-    tokens = generate_access_refresh_token(user)
+    tokens = await generate_access_refresh_token(db, user)
 
-    add_token_to_blacklist(form_data.refresh_token)
+    add_token_to_blacklist(token.refresh_token)
 
     return tokens
 
