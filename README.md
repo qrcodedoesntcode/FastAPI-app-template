@@ -10,8 +10,11 @@ Simple FastAPI template to bootstrap a new project quickly (Python > 3.10)
 - [FastAPI](https://fastapi.tiangolo.com/) as web framework
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/) for database migrations
 - [SQLAlchemy](https://www.sqlalchemy.org/) as ORM
+- [PostgreSQL](https://www.postgresql.org/) as database
 - [Pydantic](https://docs.pydantic.dev/) for data validation
 - [Docker](https://www.docker.com/) for containerization
+- [Black](https://black.readthedocs.io/en/stable/) / [Flake8](https://flake8.pycqa.org/en/latest/) / [Isort](https://pycqa.github.io/isort/) for code formatting
+- [Sentry](https://sentry.io/welcome/) for error tracking (_Optional_)
 - [Redis](https://redis.io/) to blacklist JWT tokens (_Optional_)
 
 ## Features

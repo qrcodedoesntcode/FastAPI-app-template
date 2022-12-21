@@ -22,7 +22,7 @@ async def generate():
                     password=fake.password(),
                     is_active=True,
                 )
-                for _ in range(10_000)
+                for _ in range(100_000)
             ]
         )
 
@@ -32,7 +32,7 @@ async def generate():
                     name=fake.unique.text(max_nb_chars=50),
                     description=fake.text(max_nb_chars=255),
                 )
-                for _ in range(500)
+                for _ in range(5000)
             ]
         )
 
@@ -42,7 +42,7 @@ async def generate():
                     scope=fake.unique.text(max_nb_chars=50),
                     description=fake.text(max_nb_chars=255),
                 )
-                for _ in range(500)
+                for _ in range(5000)
             ]
         )
 
