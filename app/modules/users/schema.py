@@ -15,7 +15,7 @@ class UserProfile(UserProfileBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserBase(BaseModel):
@@ -35,7 +35,7 @@ class UserInDBBase(UserBase):
     updated_at: datetime = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserInDBProfile(UserInDBBase):

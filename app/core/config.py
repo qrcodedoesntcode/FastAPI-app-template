@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from pydantic.networks import AnyHttpUrl
 
 
@@ -16,7 +16,7 @@ class Config(BaseSettings):
     Base configuration.
     """
 
-    API_V1_STR = "/api/v1"
+    API_V1_STR: str = "/api/v1"
 
     APP_VERSION: str = "Unversioned API"
     FASTAPI_ENV: AppEnvironment = AppEnvironment.PRODUCTION
@@ -47,9 +47,9 @@ class Config(BaseSettings):
     LOGGING_LEVEL: str = "INFO"
     SQL_VERBOSE_LOGGING: bool = False
 
-    ALGORITHM = "HS384"
-    ACCESS_TOKEN_EXPIRE_MINUTES = 15
-    REFRESH_TOKEN_EXPIRE_MINUTES = 10_080
+    ALGORITHM: str = "HS384"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 10_080
 
     USERS_OPEN_REGISTRATION: bool = True
 
