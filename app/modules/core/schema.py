@@ -1,5 +1,4 @@
-from fastapi import Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class OrmTrue(BaseModel):
@@ -10,18 +9,18 @@ class OrmTrue(BaseModel):
 # Role classes
 class RoleBase(OrmTrue):
     id: int | None = None
-    name: str | None = Query(None, min_length=3, max_length=50)
-    description: str | None = Query(None, max_length=255)
+    name: str | None = Field(None, min_length=4, max_length=50)
+    description: str | None = Field(None, max_length=255)
 
 
 class RoleUpdate(OrmTrue):
-    name: str | None = Query(None, min_length=3, max_length=50)
-    description: str | None = Query(None, max_length=255)
+    name: str | None = Field(None, min_length=4, max_length=50)
+    description: str | None = Field(None, max_length=255)
 
 
 class RoleCreate(OrmTrue):
-    name: str
-    description: str
+    name: str = Field(..., min_length=4, max_length=50)
+    description: str = Field(None, max_length=255)
 
 
 class UserRoleBase(OrmTrue):
@@ -32,36 +31,18 @@ class UserRoleBase(OrmTrue):
 
 class PermissionBase(OrmTrue):
     id: int | None = None
-    scope: str | None = Query(
-        None,
-        min_length=1,
-        max_length=255,
-        property={
-            "description": "The scope of the permission",
-            "placeholder": "admin",
-            "example": "admin",
-        },
-    )
+    scope: str | None = Field(None, min_length=4, max_length=255)
     description: str | None = None
 
 
 class PermissionUpdate(OrmTrue):
-    scope: str | None = Query(
-        None,
-        min_length=1,
-        max_length=255,
-        property={
-            "description": "The scope of the permission",
-            "placeholder": "admin",
-            "example": "admin",
-        },
-    )
+    scope: str | None = Field(None, min_length=4, max_length=255)
     description: str | None = None
 
 
 class PermissionCreate(OrmTrue):
-    scope: str
-    description: str
+    scope: str = Field(..., min_length=4, max_length=255)
+    description: str = Field(..., max_length=255)
 
 
 class UserPermissionBase(OrmTrue):
