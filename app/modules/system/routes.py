@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -23,7 +24,7 @@ def root() -> dict:
 @router.get("/health", status_code=status.HTTP_200_OK, response_model=DefaultResponse)
 async def get_health(db: AsyncSession = Depends(get_db)) -> dict:
     try:
-        healthy = await db.execute("SELECT 1")
+        healthy = await db.execute(text("SELECT 1"))
         if healthy.scalars().first() is None:
             raise HTTPException(status_code=404, detail={"msg": "Not Healthy ❌"})
     except Exception as e:

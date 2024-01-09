@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+from typing import Union
 
 import bcrypt
 from fastapi import Depends, HTTPException, Query
@@ -94,7 +95,9 @@ async def check_user_auth(db: AsyncSession, username: str, password: str):
 
 
 def create_jwt_token(
-    data: dict, expires_delta: timedelta | None = None, type: str = "access_token"
+    data: dict[str, Union[str, list[str]]],
+    expires_delta: timedelta | None = None,
+    type: str = "access_token",
 ):
     """
     Create a JWT token (access_token/refresh_token) for a specific user (sub).
@@ -247,7 +250,7 @@ def add_token_to_blacklist(token: str, type: str = "refresh_token") -> None:
     logger.info(f"Adding {jti} (expiring {exp}) to blacklist")
 
 
-async def generate_access_refresh_token(db: AsyncSession, user) -> dict:
+async def generate_access_refresh_token(db: AsyncSession, user) -> dict[str, str]:
     """
     Return an access token and a refresh token for a specific user.
     """

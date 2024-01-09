@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import List
 
-from pydantic_settings import BaseSettings
 from pydantic.networks import AnyHttpUrl
+from pydantic_settings import BaseSettings
 
 
 class AppEnvironment(str, Enum):

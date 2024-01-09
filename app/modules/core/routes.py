@@ -20,9 +20,12 @@ from app.modules.core.crud import get_user_permission, get_user_roles
 from app.modules.core.models import Permission, Role, User
 from app.modules.core.schema import (
     PermissionBase,
+    PermissionCreate,
+    PermissionUpdate,
     RoleBase,
     RoleCreate,
     RolePermissions,
+    RoleUpdate,
     UserPermissionBase,
     UserRoleBase,
 )
@@ -70,13 +73,13 @@ async def create_role(
 )
 async def update_role(
     role_id: int,
-    role: RoleBase,
+    role: RoleUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "role:update"]
     ),
 ) -> RoleBase:
-    await check_if_exists(db, Role, [Role.id == role_id])
+    await check_if_exists(db, Role, [Role.name == role.name])
 
     return await update_entry(db, Role, role_id, role)
 
@@ -139,10 +142,10 @@ async def link_role_to_user(
 
 
 @router.get(
-    "/roles/{role_id}",
+    "/roles/{role_id}/permissions",
     status_code=status.HTTP_200_OK,
     response_model=RolePermissions,
-    name="Get permissions from a specific role",
+    name="Get specific permissions for a role",
 )
 async def role_permission(
     role_id: int,
@@ -268,12 +271,12 @@ async def get_permissions(
 
 @router.post(
     "/permissions",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     response_model=PermissionBase,
     name="Create permission",
 )
 async def create_permission(
-    permission: PermissionBase,
+    permission: PermissionCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:create"]
@@ -291,7 +294,7 @@ async def create_permission(
 )
 async def edit_permission(
     permission_id: int,
-    permission: PermissionBase,
+    permission: PermissionUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:update"]

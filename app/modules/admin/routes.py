@@ -82,7 +82,6 @@ async def update_specific_profile(
         get_current_active_user, scopes=["admin"]
     ),
 ) -> UserSchemaProfile:
-
     return await update_entry(db, Profile, user_id, profile)
 
 

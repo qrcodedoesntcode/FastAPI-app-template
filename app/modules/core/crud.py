@@ -42,4 +42,6 @@ async def get_user_permission(db: AsyncSession, user_id: int) -> UserPermissionB
         permission for role in result.roles for permission in role.permissions
     ]
 
-    return UserPermissionBase(username=result.username, permissions=user_permission)
+    return UserPermissionBase(
+        id=result.id, username=result.username, permissions=user_permission
+    )

@@ -33,5 +33,4 @@ async def update_current_profile(
     db: AsyncSession = Depends(get_db),
     current_user: UserSchemaProfile = Security(get_current_active_user),
 ) -> UserSchemaProfile:
-
     return await update_entry(db, Profile, current_user.id, profile)
