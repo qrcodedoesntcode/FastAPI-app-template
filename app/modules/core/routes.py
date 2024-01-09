@@ -48,6 +48,22 @@ async def get_roles(
     return await paginate(db, get_all_paginate(Role))
 
 
+@router.get(
+    "/roles/{role_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=RoleBase,
+    name="Get specific role",
+)
+async def get_specific_role(
+    role_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "role:read"]
+    ),
+) -> RoleBase:
+    return await get_specific_by_id(db, Role, role_id)
+
+
 @router.post(
     "/roles",
     status_code=status.HTTP_200_OK,
@@ -267,6 +283,22 @@ async def get_permissions(
     ),
 ) -> AbstractPage:
     return await paginate(db, get_all_paginate(Permission))
+
+
+@router.get(
+    "/permissions/{permission_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionBase,
+    name="Get specific permission",
+)
+async def get_specific_permission(
+    permission_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Security(  # noqa
+        get_current_active_user, scopes=["admin", "permission:read"]
+    ),
+) -> PermissionBase:
+    return await get_specific_by_id(db, Permission, permission_id)
 
 
 @router.post(
