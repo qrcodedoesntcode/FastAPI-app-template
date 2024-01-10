@@ -14,6 +14,7 @@ Simple FastAPI template to bootstrap a new project quickly (Python > 3.10)
 - [Pydantic](https://docs.pydantic.dev/) for data validation
 - [Docker](https://www.docker.com/) for containerization
 - [Black](https://black.readthedocs.io/en/stable/) / [Flake8](https://flake8.pycqa.org/en/latest/) / [Isort](https://pycqa.github.io/isort/) for code formatting
+- [Mailjet](https://www.mailjet.com/) for sending emails
 - [Sentry](https://sentry.io/welcome/) for error tracking (_Optional_)
 - [Redis](https://redis.io/) to blacklist JWT tokens (_Optional_)
 
@@ -26,6 +27,7 @@ Simple FastAPI template to bootstrap a new project quickly (Python > 3.10)
 - [x] RBAC (Role-Based Access Control)
 - [x] Role/Permission based on FastAPI Scopes (see [here](https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/?h=scope))
 - [x] Async FastAPI/SQLAlchemy
+- [x] Can send emails with Mailjet API
 - [x] Sentry integration for error tracking (_Optional_)
 - [x] Redis integration for JWT token blacklist (_Optional_ : use dict instead)
 - [ ] Tests
