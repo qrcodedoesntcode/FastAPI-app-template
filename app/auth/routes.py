@@ -28,9 +28,9 @@ router = APIRouter(prefix="/auth")
     "/signup",
     status_code=status.HTTP_201_CREATED,
     response_model=UserSchema,
-    name="Create an account",
+    description="Create an account",
 )
-async def create_user(
+async def signup(
     user: UserCreate, request: Request, db: AsyncSession = Depends(get_db)
 ) -> UserSchema:
     if not settings.USERS_OPEN_REGISTRATION:
@@ -72,12 +72,12 @@ async def create_user(
 
 
 @router.post(
-    "/token",
+    "/login",
     status_code=status.HTTP_201_CREATED,
     response_model=Token,
-    name="Get an access/refresh token",
+    description="Get an access/refresh token",
 )
-async def login_for_access_token(
+async def login(
     db: AsyncSession = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> dict:
     user = await check_user_auth(db, form_data.username, form_data.password)
@@ -85,13 +85,12 @@ async def login_for_access_token(
 
 
 @router.post(
-    "/refresh_token",
+    "/refresh_access_token/{token}",
     status_code=status.HTTP_201_CREATED,
     response_model=Token,
-    name="refresh_access_token",
     description="Refresh an access token using a refresh token",
 )
-async def refresh_token(
+async def refresh_access_token(
     db: AsyncSession = Depends(get_db), token: RefreshToken = Depends()
 ) -> dict:
     user = await validate_refresh_token(db, token=token.refresh_token)
@@ -104,7 +103,7 @@ async def refresh_token(
 
 
 @router.post(
-    "/logout", status_code=status.HTTP_200_OK, name="Logout", response_model=Message
+    "/logout", status_code=status.HTTP_200_OK, response_model=Message
 )
 async def logout() -> dict:
     # Remove access_token/refresh_token from the frontend
@@ -115,7 +114,7 @@ async def logout() -> dict:
     "/verify_email/{token}",
     status_code=status.HTTP_200_OK,
     response_model=Message,
-    name="verify_email",
+    description="Verify an email",
 )
 async def verify_email(token: str, db: AsyncSession = Depends(get_db)) -> dict:
     email_verification = await get_specific(
@@ -139,8 +138,8 @@ async def verify_email(token: str, db: AsyncSession = Depends(get_db)) -> dict:
 @router.get(
     "/resend_verification_email/{email}",
     status_code=status.HTTP_200_OK,
-    name="Resend verification email",
     response_model=Message,
+    description="Resend a verification email",
 )
 async def resend_verification_email(
     email: str, request: Request, db: AsyncSession = Depends(get_db)

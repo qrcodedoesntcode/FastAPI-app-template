@@ -29,9 +29,9 @@ router = APIRouter(prefix="/admin")
     "/users",
     status_code=status.HTTP_200_OK,
     response_model=Page[UserSchema],
-    name="Get all users",
+    description="Get all users with pagination",
 )
-async def get_users(
+async def get_all_users(
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(get_current_active_user, scopes=["admin"]),  # noqa
 ) -> AbstractPage:
@@ -42,7 +42,7 @@ async def get_users(
     "/users/{user_id}",
     response_model=UserSchemaProfile,
     status_code=status.HTTP_200_OK,
-    name="Get specific user by user_id",
+    description="Get specific user by user_id",
 )
 async def get_specific_user(
     user_id: int,
@@ -58,7 +58,7 @@ async def get_specific_user(
     "/users/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=DefaultResponse,
-    name="Delete specific user by user_id",
+    description="Delete specific user by user_id",
 )
 async def delete_specific_user(
     user_id: int,
@@ -69,10 +69,10 @@ async def delete_specific_user(
 
 
 @router.put(
-    "/{user_id}/profile",
+    "/users/{user_id}/profile",
     status_code=status.HTTP_200_OK,
     response_model=UserProfile,
-    name="Update specific user profile",
+    description="Update specific user profile",
 )
 async def update_specific_profile(
     user_id: int,

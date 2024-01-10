@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users")
     "/current",
     status_code=status.HTTP_200_OK,
     response_model=UserSchemaProfile,
-    name="Get current user",
+    description="Get current user with profile information",
 )
 def get_current_user(
     current_user: UserSchemaProfile = Security(get_current_active_user),
@@ -26,7 +26,7 @@ def get_current_user(
     "/current/profile",
     status_code=status.HTTP_200_OK,
     response_model=UserProfile,
-    name="Update current user profile",
+    description="Update current user profile with new information",
 )
 async def update_current_profile(
     profile: UserProfileBase,

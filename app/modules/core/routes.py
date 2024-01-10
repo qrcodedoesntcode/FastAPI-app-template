@@ -37,9 +37,9 @@ router = APIRouter(prefix="/core")
     "/roles",
     status_code=status.HTTP_200_OK,
     response_model=Page[RoleBase],
-    name="Get all roles",
+    description="Get all roles with pagination",
 )
-async def get_roles(
+async def get_all_roles(
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "role:read"]
@@ -52,7 +52,7 @@ async def get_roles(
     "/roles/{role_id}",
     status_code=status.HTTP_200_OK,
     response_model=RoleBase,
-    name="Get specific role",
+    description="Get specific role by role_id",
 )
 async def get_specific_role(
     role_id: int,
@@ -68,7 +68,7 @@ async def get_specific_role(
     "/roles",
     status_code=status.HTTP_200_OK,
     response_model=RoleBase,
-    name="Create a role",
+    description="Create a role",
 )
 async def create_role(
     role: RoleCreate,
@@ -85,9 +85,9 @@ async def create_role(
     "/roles/{role_id}",
     status_code=status.HTTP_200_OK,
     response_model=RoleBase,
-    name="Update specific role",
+    description="Update specific role by role_id",
 )
-async def update_role(
+async def update_specific_role(
     role_id: int,
     role: RoleUpdate,
     db: AsyncSession = Depends(get_db),
@@ -104,9 +104,9 @@ async def update_role(
     "/roles/{role_id}",
     status_code=status.HTTP_200_OK,
     response_model=DefaultResponse,
-    name="Delete specific role",
+    description="Delete specific role by role_id",
 )
-async def delete_role(
+async def delete_specific_role(
     role_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
@@ -120,7 +120,7 @@ async def delete_role(
     "/roles/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserRoleBase,
-    name="Get specific user roles",
+    description="Get specific user roles by user_id",
 )
 async def get_specific_user_roles(
     user_id: int,
@@ -136,7 +136,7 @@ async def get_specific_user_roles(
     "/roles/{role_id}/user/{user_id}",
     status_code=status.HTTP_201_CREATED,
     response_model=UserRoleBase,
-    name="Link role to a user",
+    description="Link role to a user given a role_id and user_id",
 )
 async def link_role_to_user(
     role_id: int,
@@ -161,9 +161,9 @@ async def link_role_to_user(
     "/roles/{role_id}/permissions",
     status_code=status.HTTP_200_OK,
     response_model=RolePermissions,
-    name="Get specific permissions for a role",
+    description="Get specific permissions for a role given a role_id",
 )
-async def role_permission(
+async def get_role_permission(
     role_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
@@ -184,7 +184,7 @@ async def role_permission(
     "/roles/{role_id}/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=DefaultResponse,
-    name="Unlink a role from a user",
+    description="Unlink a role from a user given a role_id and user_id",
 )
 async def unlink_role_from_user(
     role_id: int,
@@ -214,7 +214,7 @@ async def unlink_role_from_user(
     "/roles/{role_id}/permission/{permission_id}",
     status_code=status.HTTP_200_OK,
     response_model=RolePermissions,
-    name="Link role to a permission",
+    description="Link role to a permission given a role_id and permission_id",
 )
 async def link_role_to_permission(
     role_id: int,
@@ -244,7 +244,7 @@ async def link_role_to_permission(
     "/roles/{role_id}/permission/{permission_id}",
     status_code=status.HTTP_200_OK,
     response_model=DefaultResponse,
-    name="Unlink a role from a permission",
+    description="Unlink a role from a permission given a role_id and permission_id",
 )
 async def unlink_role_from_permission(
     role_id: int,
@@ -274,9 +274,9 @@ async def unlink_role_from_permission(
     "/permissions",
     status_code=status.HTTP_200_OK,
     response_model=Page[PermissionBase],
-    name="Get all permissions",
+    description="Get all permissions with pagination",
 )
-async def get_permissions(
+async def get_all_permissions(
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
         get_current_active_user, scopes=["admin", "permission:read"]
@@ -289,7 +289,7 @@ async def get_permissions(
     "/permissions/{permission_id}",
     status_code=status.HTTP_200_OK,
     response_model=PermissionBase,
-    name="Get specific permission",
+    description="Get specific permission by permission_id",
 )
 async def get_specific_permission(
     permission_id: int,
@@ -305,7 +305,7 @@ async def get_specific_permission(
     "/permissions",
     status_code=status.HTTP_201_CREATED,
     response_model=PermissionBase,
-    name="Create permission",
+    description="Create permission with a scope name and description",
 )
 async def create_permission(
     permission: PermissionCreate,
@@ -322,9 +322,9 @@ async def create_permission(
     "/permissions/{permission_id}",
     status_code=status.HTTP_200_OK,
     response_model=PermissionBase,
-    name="Update specific permission",
+    description="Update specific permission by permission_id",
 )
-async def edit_permission(
+async def update_specific_permission(
     permission_id: int,
     permission: PermissionUpdate,
     db: AsyncSession = Depends(get_db),
@@ -341,9 +341,9 @@ async def edit_permission(
     "/permissions/{permission_id}",
     status_code=status.HTTP_200_OK,
     response_model=DefaultResponse,
-    name="Delete specific permission",
+    description="Delete specific permission by permission_id",
 )
-async def delete_permission(
+async def delete_specific_permission(
     permission_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Security(  # noqa
@@ -357,7 +357,7 @@ async def delete_permission(
     "/permissions/user/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=UserPermissionBase,
-    name="Get specific user permissions",
+    description="Get specific user permissions by user_id",
 )
 async def get_specific_user_permission(
     user_id: int,
