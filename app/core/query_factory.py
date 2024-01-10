@@ -39,6 +39,23 @@ async def get_specific_by_id(db: AsyncSession, model, id: int):
         )
 
 
+async def get_specific(db: AsyncSession, model, filter_lst: list):
+    """
+    Get an entry by id
+    example:
+    get_specific(db, Role, [Role.name == "test"])
+    """
+    query = await db.execute(select(model).where(*filter_lst))
+    result = query.scalars().first()
+
+    if result is not None:
+        return result
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{model.__name__} not found"
+        )
+
+
 async def delete_by_id(db, model, id: int):
     """
     Delete an entry by id

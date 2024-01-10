@@ -13,9 +13,10 @@ from starlette import status
 from app.auth.schema import TokenData
 from app.core.config import settings
 from app.core.logger import logger
+from app.core.query_factory import check_if_exists
 from app.db.deps import get_db
 from app.modules.admin.crud import get_user_by_username
-from app.modules.core.models import User
+from app.modules.core.models import EmailVerification, User
 from app.services import strings
 from app.services.storage import storage
 
@@ -274,3 +275,11 @@ async def generate_access_refresh_token(db: AsyncSession, user) -> dict[str, str
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
+
+
+async def generate_email_token(db: AsyncSession = Depends(get_db)) -> str:
+    uuid_token = str(uuid.uuid4())
+    await check_if_exists(
+        db, EmailVerification, [EmailVerification.token == uuid_token]  # noqa
+    )
+    return uuid_token

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -38,6 +38,24 @@ class User(Base, BaseFeaturesMixin):
     roles = relationship(
         "Role", secondary=user_role, back_populates="users", lazy=False
     )
+    email_verification = relationship(
+        "EmailVerification",
+        back_populates="user",
+        cascade="all,delete",
+        uselist=False,
+        lazy=False,
+    )
+
+
+class EmailVerification(Base, BaseFeaturesMixin):
+    __tablename__ = "cre_email_verification"
+
+    token = Column(String(255), unique=True, index=True, nullable=False)
+    user_id = reference_col(User.__tablename__)
+    expires_at = Column(DateTime, nullable=False)
+
+    # Relationship
+    user = relationship("User", back_populates="email_verification", lazy=False)
 
 
 class Profile(Base, BaseFeaturesMixin):

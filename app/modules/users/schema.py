@@ -21,7 +21,6 @@ class UserProfile(UserProfileBase):
 class UserBase(BaseModel):
     username: constr(to_lower=True, min_length=4, max_length=30, strip_whitespace=True)
     email: EmailStr
-    is_active: bool | None = None
 
 
 class UserCreate(UserBase):

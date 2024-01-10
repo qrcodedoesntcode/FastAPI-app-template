@@ -41,7 +41,7 @@ class Config(BaseSettings):
     REDIS_SOCKET_TIMEOUT: int = 5
 
     SENTRY_ENABLED: bool | None = False
-    SENTRY_DSN: str | None = ""
+    SENTRY_DSN: str | None = None
     SENTRY_ENV: str | None = "dev"
 
     LOGGING_LEVEL: str = "INFO"
@@ -50,6 +50,13 @@ class Config(BaseSettings):
     ALGORITHM: str = "HS384"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 10_080
+
+    EMAIL_TOKEN_EXPIRE_HOURS: int = 24
+    EMAIL_SENDER: str = "fastapi@example.com"
+    EMAIL_SENDER_NAME: str = "FastAPI app template"
+
+    MAILJET_API_KEY: str | None = None
+    MAILJET_API_SECRET: str | None = None
 
     USERS_OPEN_REGISTRATION: bool = True
 
